@@ -1,37 +1,47 @@
 import './stylesheets/index.css';
 
 import { mat4 } from 'gl-matrix';
-import { initGraphics, Color } from './utils';
+import {
+  initGraphics,
+  createVectorArray,
+  createTexture,
+
+  cvtColorObj,
+
+  Color,
+  SCALING,
+} from './utils';
+
+import { Cactus, Pot, Soil } from './plots';
+
+import brickImage from './textures/brick.png';
+import grassImage from './textures/grass.png';
+import soilImage from './textures/soil.png';
 
 const toRadians = theta => theta * Math.PI / 180;
 
-/* Coordinate utilities */
-const SCALING = { x: 300, y: 300, z: 100 };
+const drawObject = (gl, attribPointer, config, primitiveType) => {
+  primitiveType = primitiveType || gl.TRIANGLES;
 
-const createVectorArray = points => {
-  const { x = 0, y = 0, z = 0, w = 1 } = points;
+  const { projection, vertices } = config;
 
-  return [x / SCALING.x, y / SCALING.y, z / SCALING.z, w];
-};
+  const vbuffer = gl.createBuffer(); 
+  gl.bindBuffer(gl.ARRAY_BUFFER, vbuffer);
+  gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(vertices), gl.STATIC_DRAW);
 
-const createPolygonArray = points => {
-  return points.reduce((polygon, point) => {
-    polygon.push(...createVectorArray(point));
-    return polygon;
-  }, []);
-}
+  const nbuffer = gl.createBuffer();
+  gl.bindBuffer(gl.ARRAY_BUFFER, nbuffer);
+  gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(vertices), gl.STATIC_DRAW);
 
-const bufferData = (gl, attribPointer, data) => {
-  gl.bindBuffer(gl.ARRAY_BUFFER, gl.createBuffer());
-  gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(data), gl.STATIC_DRAW);
-  gl.enableVertexAttribArray(attribPointer.A_POSITION);
-  gl.vertexAttribPointer(attribPointer.A_POSITION, 4, gl.FLOAT, false, 0, 0);
-}
+  gl.vertexAttribPointer(attribPointer.A_POSITION, 3, gl.FLOAT, false, 5*4, 0);
+  gl.vertexAttribPointer(attribPointer.A_UV_COORD, 2, gl.FLOAT, false, 5*4, 3*4);
+  // gl.vertexAttribPointer(attribPointer.A_NORMAL, 4, gl.FLOAT, false, 7*4, 3*4);
 
-const renderAll = (gl, form, iterations, step = 1, skip = 0) => {
-  for (let i = 0; i < iterations; i++) {
-    gl.drawArrays(form, i * step + skip, step);
-  }
+  const ibuffer = gl.createBuffer();
+  gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, ibuffer);
+  gl.bufferData(gl.ELEMENT_ARRAY_BUFFER, new Uint8Array(Array.from({ length: vertices.length / 5 }).map((_, i) => i)), gl.STATIC_DRAW)
+
+  gl.drawElements(primitiveType, vertices.length / 5, gl.UNSIGNED_BYTE, 0)
 }
 
 function main() {
@@ -39,60 +49,133 @@ function main() {
 
   // Get Shader Pointers
   const attribPointer = {
-    U_COLOR: gl.getUniformLocation(program, 'u_color'),
+    A_POSITION: gl.getAttribLocation(program, 'a_position'),
+    A_UV_COORD: gl.getAttribLocation(program, 'a_uv_coord'),
+    A_NORMAL: gl.getAttribLocation(program, 'a_normal'),
+
     U_MODEL_MATRIX: gl.getUniformLocation(program, 'u_model_matrix'),
     U_VIEW_MATRIX: gl.getUniformLocation(program, 'u_view_matrix'),
+    U_PROJ_MATRIX: gl.getUniformLocation(program, 'u_projection_matrix'),
+    U_NORMAL_MATRIX: gl.getUniformLocation(program, 'u_normal_matrix'),
 
-    A_POSITION: gl.getAttribLocation(program, 'a_position'),
+    U_LIGHT_DIRECTION: gl.getUniformLocation(program, 'u_light_direction'),
+    U_EYE_POSITION: gl.getUniformLocation(program, 'u_eye_position'),
+
+    U_LIGHT_AMBIENT: gl.getUniformLocation(program, 'u_light_ambient'),
+    U_LIGHT_DIFFUSE: gl.getUniformLocation(program, 'u_light_diffuse'),
+    U_LIGHT_SPECULAR: gl.getUniformLocation(program, 'u_light_specular'),
+
+    U_MATERIAL_AMBIENT: gl.getUniformLocation(program, 'u_material_ambient'),
+    U_MATERIAL_DIFFUSE: gl.getUniformLocation(program, 'u_material_diffuse'),
+    U_MATERIAL_SPECULAR: gl.getUniformLocation(program, 'u_material_specular'),
+    U_SHININESS: gl.getUniformLocation(program, 'u_shininess'),
+
+    U_SAMPLE: gl.getUniformLocation(program, 'u_sampler'),
   };
+
+  gl.enable(gl.DEPTH_TEST);
+  gl.enableVertexAttribArray(attribPointer.A_POSITION);
+  gl.enableVertexAttribArray(attribPointer.A_UV_COORD);
+  // gl.enableVertexAttribArray(attribPointer.A_NORMAL);
 
   let transformationMatrix = mat4.create();
 
   // Initialize transformation matrix
-  gl.uniformMatrix4fv(
-    attribPointer.U_MODEL_MATRIX,
-    false,
-    new Float32Array(transformationMatrix)
-  );
+  gl.uniformMatrix4fv(attribPointer.U_MODEL_MATRIX, false, new Float32Array(transformationMatrix));
 
   /* Start program here */
+  const uModel = mat4.create();
+  const uNormal = mat4.create();
+
+  mat4.invert(uNormal, uModel);
+  mat4.transpose(uNormal, uNormal);
+
   const config = {
-    model: { x: 0, y: 0, z: 0 },
+    model: { x: -40, y: -40, z: 0 },
     cam: { x: 0, y: 0, z: 0 },
     lap: { x: 0, y: 0, z: 0 },
+
+    lightambient: { r: 76, g: 76, b: 76 },
+    lightdiffuse: { r: 255, g: 255, b: 255 },
+    lightspecular: { r: 255, g: 255, b: 255 },
+    lightdirection: { x: -SCALING.x, y: SCALING.y * -2.5, z: SCALING.z * -5 },
+
+    materialambient: { r: 0, g: 0, b: 0 },
+    materialdiffuse: { r: 0, g: 0, b: 0 },
+    materialspecular: { r: 255, g: 255, b: 255 },
+    materialshininess: { v: 5 },
+
+    flags: {
+      ambient: true,
+      diffuse: true,
+      specular: true,
+    },
+    uNormal,
+    isAnimating: false,
   };
-  renderArt(gl, attribPointer, config);
 
   // Bind Listeners
-  const sliders = document.querySelectorAll('input[type=range]');
-  sliders.forEach(slider => {
-    slider.addEventListener('input', e => {
-      const [className, feature, label] = e.target.name.match(/(\w+)-(\w)/);
-      const [units] = document.querySelectorAll(`.${className}`);
+  // const sliders = document.querySelectorAll('input[type=range]');
+  // sliders.forEach(slider => {
+  //   slider.addEventListener('input', e => {
+  //     const [className, feature, label] = e.target.name.match(/(\w+)-(\w)/);
+  //     const [units] = document.querySelectorAll(`.${className}`);
+  //     config[feature][label] = +e.target.value;
+  //     units.innerText = `${e.target.value}`;
+  //     renderArt(gl, attribPointer, config);
+  //   });
+  // });
 
-      config[feature][label] = +e.target.value;
-      units.innerText = `${e.target.value}`;
-      renderArt(gl, attribPointer, config);
-    });
-  })
+  // const animation = document.querySelector('input[type=checkbox]');
+  // animation.addEventListener('change', e => {
+  //   config.isAnimating = e.target.checked;
+  // });
+
+  // animate();
+  renderArt(gl, attribPointer, config);
+  
+  // function animate() {
+  //   renderArt(gl, attribPointer, config);
+
+  //   const { x } = config.model;
+
+  //   if (config.isAnimating) {
+  //     const theta = (x + 1) % 360;
+  //     config.model = { x: theta, y: theta, z: theta };
+  //   }
+
+  //   requestAnimFrame(animate);
+  // }
 }
 
 function renderArt(gl, attribPointer, config) {
-  let vertices;
+  // let vertices, colorSeq;
 
   // Model to World
   const modelMatrix = mat4.create();
   mat4.rotateX(modelMatrix, modelMatrix, toRadians(config.model.x));
   mat4.rotateY(modelMatrix, modelMatrix, toRadians(config.model.y));
   mat4.rotateZ(modelMatrix, modelMatrix, toRadians(config.model.z));
-  gl.uniformMatrix4fv(
-    attribPointer.U_MODEL_MATRIX,
-    false,
-    new Float32Array(modelMatrix)
-  );
+
+  gl.uniformMatrix4fv(attribPointer.U_MODEL_MATRIX, false, new Float32Array(modelMatrix));
 
   const viewMatrix = mat4.create();
-  const { cam, lap } = config;
+  const {
+    cam,
+    lap,
+
+    lightambient,
+    lightdiffuse,
+    lightspecular,
+    lightdirection,
+    materialambient,
+    materialdiffuse,
+    materialspecular,
+    materialshininess,
+
+    flags,
+    uNormal,
+  } = config;
 
   mat4.lookAt(
     viewMatrix,
@@ -106,20 +189,18 @@ function renderArt(gl, attribPointer, config) {
     new Float32Array(viewMatrix)
   );
 
-  // Pentagon Dimensions
-  const dimensions = {
-    base: Array.from({ length: 6 }).map((_, i, a) => {
-      const angle = 2 * Math.PI / a.length;
+  // Setup Lighting Parameters
+  gl.uniformMatrix4fv(attribPointer.U_NORMAL_MATRIX, false, new Float32Array(uNormal));
 
-      return {
-        x: 150 * Math.sin(i * angle),
-        y: 150 * Math.cos(i * angle),
-        z: 20
-      }
-    }),
-    tip: -20,
-    square: 150,
-  }
+  gl.uniform3fv(attribPointer.U_LIGHT_AMBIENT, cvtColorObj(lightambient));
+  gl.uniform3fv(attribPointer.U_LIGHT_DIFFUSE, cvtColorObj(lightdiffuse));
+  gl.uniform3fv(attribPointer.U_LIGHT_SPECULAR, cvtColorObj(lightspecular));
+  gl.uniform3fv(attribPointer.U_LIGHT_DIRECTION, createVectorArray(lightdirection));
+
+  gl.uniform3fv(attribPointer.U_MATERIAL_AMBIENT, cvtColorObj(materialambient));
+  gl.uniform3fv(attribPointer.U_MATERIAL_DIFFUSE, cvtColorObj(materialdiffuse));
+  gl.uniform3fv(attribPointer.U_MATERIAL_SPECULAR, cvtColorObj(materialspecular));
+  gl.uniform1f(attribPointer.U_SHININESS, materialshininess.v);
 
   gl.clearColor(...Color.BLACK);
   gl.clearDepth(1.0);
@@ -127,59 +208,31 @@ function renderArt(gl, attribPointer, config) {
   gl.depthFunc(gl.LEQUAL);
   gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
 
-  vertices = [
-    ...createPolygonArray([
-      dimensions.base[0],
-      { z: dimensions.tip },
-      dimensions.base[1],
+  // Grass Texture
+  const grassTexture = createTexture(gl, attribPointer, grassImage);
+  const brickTexture = createTexture(gl, attribPointer, brickImage);
+  const soilTexture = createTexture(gl, attribPointer, soilImage);
 
-      dimensions.base[1],
-      { z: dimensions.tip },
-      dimensions.base[2],
+  grassTexture.addEventListener('load', function() {
+    gl.pixelStorei(gl.UNPACK_FLIP_Y_WEBGL, 1);
+    gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGB, gl.RGB, gl.UNSIGNED_BYTE, this);
 
-      dimensions.base[2],
-      { z: dimensions.tip },
-      dimensions.base[3],
-
-      dimensions.base[3],
-      { z: dimensions.tip },
-      dimensions.base[4],
-
-      dimensions.base[4],
-      { z: dimensions.tip },
-      dimensions.base[5],
-
-      dimensions.base[5],
-      { z: dimensions.tip },
-      dimensions.base[0],
-    ]),
-    ...createPolygonArray(dimensions.base),
-    ...createPolygonArray([
-      { x: -dimensions.square, y: -dimensions.square, z: 75 },
-      { x: -dimensions.square, y: dimensions.square, z: 75 },
-      { x: dimensions.square, y: dimensions.square, z: 75 },
-      { x: -dimensions.square, y: -dimensions.square, z: 75 },
-      { x: dimensions.square, y: -dimensions.square, z: 75 },
-      { x: dimensions.square, y: dimensions.square, z: 75 },
-    ])
-  ]
-  bufferData(gl, attribPointer, vertices);
-
-  const seq = [Color.BLUE, Color.VIOLET, Color.GRAY, Color.YELLOW, Color.ORANGE, Color.RED];
-
-  seq.forEach((color, i) => {
-    gl.uniform4f(attribPointer.U_COLOR, ...color);
-    gl.drawArrays(gl.TRIANGLES, i * 3, 3);
+    drawObject(gl, attribPointer, { vertices: Cactus });
   });
 
-  gl.uniform4f(attribPointer.U_COLOR, ...Color.GREEN);
-  gl.drawArrays(gl.TRIANGLE_FAN, 18, 6);
+  brickTexture.addEventListener('load', function() {
+    gl.pixelStorei(gl.UNPACK_FLIP_Y_WEBGL, 1);
+    gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGB, gl.RGB, gl.UNSIGNED_BYTE, this);
 
-  gl.uniform4f(attribPointer.U_COLOR, ...Color.WHITE);
-  renderAll(gl, gl.TRIANGLES, 2, 3, 24);
+    drawObject(gl, attribPointer, { vertices: Pot });
+  });
 
-  bufferData(gl, attribPointer, null);
+  soilTexture.addEventListener('load', function() {
+    gl.pixelStorei(gl.UNPACK_FLIP_Y_WEBGL, 1);
+    gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGB, gl.RGB, gl.UNSIGNED_BYTE, this);
+
+    drawObject(gl, attribPointer, { vertices: Soil });
+  });
 }
 
 main();
-

@@ -19,13 +19,17 @@ module.exports = {
         test: /\.css$/,
         use: [
           { loader: 'style-loader/url' },
-          { loader: 'file-loader' }
+          { loader: 'file-loader' },
         ]
       },
       {
         test: /\.glsl$/,
         loader: 'webpack-glsl-loader'
       },
+      {
+        test: /\.(png|jpe?g|gif|bmp)$/,
+        use: 'file-loader',
+      }
     ]
   },
   plugins: [

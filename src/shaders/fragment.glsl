@@ -2,9 +2,13 @@
 
 precision mediump float;
 
-uniform vec4 u_color;
+uniform sampler2D u_sampler;
+in vec2 v_uv_coord;
+
+// in vec4 v_color; // remove
 out vec4 outColor;
 
 void main() {
-  outColor = u_color;
+  // outColor = v_color;
+  outColor = texture(u_sampler, v_uv_coord);// * v_color;
 }
