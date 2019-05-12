@@ -5,7 +5,6 @@ import { mat4 } from 'gl-matrix';
 import {
   initGraphics,
   createVectorArray,
-  createTexture,
 
   cvtColorObj,
 
@@ -16,30 +15,6 @@ import {
 import { Cactus, Pterodactyl } from './objects';
 
 const toRadians = theta => theta * Math.PI / 180;
-
-const drawObject = (gl, attribPointer, config, primitiveType) => {
-  primitiveType = primitiveType || gl.TRIANGLES;
-
-  const { projection, vertices } = config;
-
-  const vbuffer = gl.createBuffer(); 
-  gl.bindBuffer(gl.ARRAY_BUFFER, vbuffer);
-  gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(vertices), gl.STATIC_DRAW);
-
-  const nbuffer = gl.createBuffer();
-  gl.bindBuffer(gl.ARRAY_BUFFER, nbuffer);
-  gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(vertices), gl.STATIC_DRAW);
-
-  gl.vertexAttribPointer(attribPointer.A_POSITION, 3, gl.FLOAT, false, 5*4, 0);
-  gl.vertexAttribPointer(attribPointer.A_UV_COORD, 2, gl.FLOAT, false, 5*4, 3*4);
-  // gl.vertexAttribPointer(attribPointer.A_NORMAL, 4, gl.FLOAT, false, 7*4, 3*4);
-
-  const ibuffer = gl.createBuffer();
-  gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, ibuffer);
-  gl.bufferData(gl.ELEMENT_ARRAY_BUFFER, new Uint8Array(Array.from({ length: vertices.length / 5 }).map((_, i) => i)), gl.STATIC_DRAW)
-
-  gl.drawElements(primitiveType, vertices.length / 5, gl.UNSIGNED_BYTE, 0)
-}
 
 function main() {
   const { gl, program } = initGraphics('main', { width: 600, height: 600 });
