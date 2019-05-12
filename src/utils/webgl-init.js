@@ -11,7 +11,7 @@
  * based on various init utilities in webGL
  */
 import WebGLDebugUtils from 'webgl-debug';
-import WebGLUtils from 'webgl-utils';
+import WebGLUtils from './webgl-utils';
 
 /**
  * Initialize and get the rendering for WebGL
