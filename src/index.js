@@ -13,8 +13,7 @@ import {
   SCALING,
 } from './utils';
 
-import { Cactus, Pot, Soil } from './plots';
-import { Ptero, Wings } from './ptero';
+import { Cactus, Pot, Soil, Ptero, Wings } from './plots';
 
 import brickImage from './textures/brick.png';
 import grassImage from './textures/grass.png';
