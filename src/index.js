@@ -13,12 +13,7 @@ import {
   SCALING,
 } from './utils';
 
-import { Cactus, Pot, Soil, Ptero, Wings } from './plots';
-
-import brickImage from './textures/brick.png';
-import grassImage from './textures/grass.png';
-import soilImage from './textures/soil.png';
-import wingsImage from './textures/wings.png';
+import { Cactus, Pterodactyl } from './objects';
 
 const toRadians = theta => theta * Math.PI / 180;
 
@@ -183,57 +178,14 @@ function renderArt(gl, attribPointer, config) {
   gl.clearDepth(1.0);
   gl.enable(gl.DEPTH_TEST);
   gl.depthFunc(gl.LEQUAL);
-  gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
-
-  // Grass Texture
-  const grassTexture = createTexture(gl, attribPointer, grassImage);
-  const brickTexture = createTexture(gl, attribPointer, brickImage);
-  const soilTexture = createTexture(gl, attribPointer, soilImage);
-
-  grassTexture.addEventListener('load', function() {
-    gl.pixelStorei(gl.UNPACK_FLIP_Y_WEBGL, 1);
-    gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGB, gl.RGB, gl.UNSIGNED_BYTE, this);
-
-    drawObject(gl, attribPointer, { vertices: Cactus });
-  });
-
-  brickTexture.addEventListener('load', function() {
-    gl.pixelStorei(gl.UNPACK_FLIP_Y_WEBGL, 1);
-    gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGB, gl.RGB, gl.UNSIGNED_BYTE, this);
-
-    drawObject(gl, attribPointer, { vertices: Pot });
-  });
-
-  soilTexture.addEventListener('load', function() {
-    gl.pixelStorei(gl.UNPACK_FLIP_Y_WEBGL, 1);
-    gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGB, gl.RGB, gl.UNSIGNED_BYTE, this);
-
-    drawObject(gl, attribPointer, { vertices: Soil });
-  });
-
-  grassTexture.addEventListener('load', function() {
-    gl.pixelStorei(gl.UNPACK_FLIP_Y_WEBGL, 1);
-    gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGB, gl.RGB, gl.UNSIGNED_BYTE, this);
-
-    drawObject(gl, attribPointer, { vertices: Cactus });
-  });
+  gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);  
 
 
-  // Ptero Texture
-  const pteroTexture = createTexture(gl, attribPointer, wingsImage);
-  const wingsTexture = createTexture(gl, attribPointer, wingsImage);
-  wingsTexture.addEventListener('load', function() {
-    gl.pixelStorei(gl.UNPACK_FLIP_Y_WEBGL, 1);
-    gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGB, gl.RGB, gl.UNSIGNED_BYTE, this);
+  const cactus = new Cactus(gl, attribPointer);
+  const ptero = new Pterodactyl(gl, attribPointer);
 
-    drawObject(gl, attribPointer, { vertices: Wings });
-  });
-  pteroTexture.addEventListener('load', function() {
-    gl.pixelStorei(gl.UNPACK_FLIP_Y_WEBGL, 1);
-    gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGB, gl.RGB, gl.UNSIGNED_BYTE, this);
-
-    drawObject(gl, attribPointer, { vertices: Ptero });
-  });
+  cactus.render();
+  ptero.render();
 }
 
 main();
