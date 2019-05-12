@@ -13,37 +13,9 @@ import {
   SCALING,
 } from './utils';
 
-import { Cactus, Pot, Soil } from './plots';
-
-import brickImage from './textures/brick.png';
-import grassImage from './textures/grass.png';
-import soilImage from './textures/soil.png';
+import { Cactus } from './objects';
 
 const toRadians = theta => theta * Math.PI / 180;
-
-const drawObject = (gl, attribPointer, config, primitiveType) => {
-  primitiveType = primitiveType || gl.TRIANGLES;
-
-  const { projection, vertices } = config;
-
-  const vbuffer = gl.createBuffer(); 
-  gl.bindBuffer(gl.ARRAY_BUFFER, vbuffer);
-  gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(vertices), gl.STATIC_DRAW);
-
-  const nbuffer = gl.createBuffer();
-  gl.bindBuffer(gl.ARRAY_BUFFER, nbuffer);
-  gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(vertices), gl.STATIC_DRAW);
-
-  gl.vertexAttribPointer(attribPointer.A_POSITION, 3, gl.FLOAT, false, 5*4, 0);
-  gl.vertexAttribPointer(attribPointer.A_UV_COORD, 2, gl.FLOAT, false, 5*4, 3*4);
-  // gl.vertexAttribPointer(attribPointer.A_NORMAL, 4, gl.FLOAT, false, 7*4, 3*4);
-
-  const ibuffer = gl.createBuffer();
-  gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, ibuffer);
-  gl.bufferData(gl.ELEMENT_ARRAY_BUFFER, new Uint8Array(Array.from({ length: vertices.length / 5 }).map((_, i) => i)), gl.STATIC_DRAW)
-
-  gl.drawElements(primitiveType, vertices.length / 5, gl.UNSIGNED_BYTE, 0)
-}
 
 function main() {
   const { gl, program } = initGraphics('main', { width: 600, height: 600 });
@@ -184,31 +156,9 @@ function renderArt(gl, attribPointer, config) {
   gl.depthFunc(gl.LEQUAL);
   gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
 
-  // Grass Texture
-  const grassTexture = createTexture(gl, attribPointer, grassImage);
-  const brickTexture = createTexture(gl, attribPointer, brickImage);
-  const soilTexture = createTexture(gl, attribPointer, soilImage);
-
-  grassTexture.addEventListener('load', function() {
-    gl.pixelStorei(gl.UNPACK_FLIP_Y_WEBGL, 1);
-    gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGB, gl.RGB, gl.UNSIGNED_BYTE, this);
-
-    drawObject(gl, attribPointer, { vertices: Cactus });
-  });
-
-  brickTexture.addEventListener('load', function() {
-    gl.pixelStorei(gl.UNPACK_FLIP_Y_WEBGL, 1);
-    gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGB, gl.RGB, gl.UNSIGNED_BYTE, this);
-
-    drawObject(gl, attribPointer, { vertices: Pot });
-  });
-
-  soilTexture.addEventListener('load', function() {
-    gl.pixelStorei(gl.UNPACK_FLIP_Y_WEBGL, 1);
-    gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGB, gl.RGB, gl.UNSIGNED_BYTE, this);
-
-    drawObject(gl, attribPointer, { vertices: Soil });
-  });
+  // Renders
+  const cactus = new Cactus(gl, attribPointer);
+  cactus.render();
 }
 
 main();
