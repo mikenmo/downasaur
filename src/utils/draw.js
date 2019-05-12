@@ -1,4 +1,4 @@
-export const SCALING = { x: 300, y: 300, z: 300 };
+export const SCALING = { x: 800, y: 800, z: 800 };
 
 export const createVectorArray = points => {
   const { x = 0, y = 0, z = 0 } = points;
