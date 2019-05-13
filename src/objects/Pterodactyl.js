@@ -16,7 +16,7 @@ class Pterodactyl {
     return { x: this.x, y: this.y };
   }
 
-  render(wingsPos) {
+  render(wingsPos,translate,scale) {
     const { gl, attribPointer } = this;
 
     const pteroTexture = createTexture(gl, attribPointer, wingsImage);
@@ -25,14 +25,14 @@ class Pterodactyl {
     wingsTexture.addEventListener('load', function() {
       gl.pixelStorei(gl.UNPACK_FLIP_Y_WEBGL, 1);
       gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGB, gl.RGB, gl.UNSIGNED_BYTE, this);
-      drawObject(gl, attribPointer, { vertices: Wings(wingsPos) });
+      drawObject(gl, attribPointer, { vertices: Wings(wingsPos,translate,scale) });
     });
 
     pteroTexture.addEventListener('load', function() {
       gl.pixelStorei(gl.UNPACK_FLIP_Y_WEBGL, 1);
       gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGB, gl.RGB, gl.UNSIGNED_BYTE, this);
 
-      drawObject(gl, attribPointer, { vertices: Ptero });
+      drawObject(gl, attribPointer, { vertices: Ptero(translate,scale) });
     });
   }
 }

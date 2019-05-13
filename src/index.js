@@ -160,7 +160,7 @@ function renderArt(gl, attribPointer, config) {
   const ptero = new Pterodactyl(gl, attribPointer);
 
   cactus.render();
-  ptero.render(wingsPos);
+  ptero.render(wingsPos,{x:0,y:0,z:0},0.25);
 }
 
 main();
