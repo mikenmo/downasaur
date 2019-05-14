@@ -50,16 +50,14 @@ function createPlayer() {
     if (
       event.keyCode === 37 &&
       player.object.position.x !==
-        -(CONSTANTS.PLANE_WIDTH - CONSTANTS.PADDING) / 2 &&
-      player.object.position === 5
+        -(CONSTANTS.PLANE_WIDTH - CONSTANTS.PADDING) / 2
     ) {
       player.object.position.x -=
         (CONSTANTS.PLANE_WIDTH - CONSTANTS.PADDING) / 2;
     } else if (
       event.keyCode === 39 &&
       player.object.position.x !==
-        (CONSTANTS.PLANE_WIDTH - CONSTANTS.PADDING) / 2 &&
-      player.object.position === 5
+        (CONSTANTS.PLANE_WIDTH - CONSTANTS.PADDING) / 2
     ) {
       player.object.position.x +=
         (CONSTANTS.PLANE_WIDTH - CONSTANTS.PADDING) / 2;
