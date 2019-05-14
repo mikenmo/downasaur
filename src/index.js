@@ -12,7 +12,10 @@ import "./stylesheets/index.css";
 const CONSTANTS = {
   PLANE_WIDTH: 50,
   PLANE_LENGTH: 1000,
-  PADDING: 20
+  PADDING: 20,
+
+  MIN_INTERVAL: 3,
+  MAX_INTERVAL: 10,
 };
 
 const GAME = {
@@ -117,7 +120,9 @@ function main(mount) {
   GAME.floor = new THREE.Mesh(floorGeometry, floorMaterial);
   GAME.floor.rotation.x = 1.57;
   GAME.floor.receiveShadow = true;
+  
   createCactus();
+
   GAME.player = new Hero();
   GAME.scene.add(
     GAME.camera,
@@ -133,7 +138,7 @@ function main(mount) {
         obstacle.object.position.z <
         CONSTANTS.PLANE_LENGTH / 2 + CONSTANTS.PLANE_LENGTH / 10
       ) {
-        obstacle.object.position.z += 10;
+        obstacle.object.position.z += 20;
       }
     });
     GAME.controls.update();
@@ -151,7 +156,6 @@ function createCactus() {
     (CONSTANTS.PLANE_WIDTH - CONSTANTS.PADDING) / 2
   ];
   const zPositionValues = [-(CONSTANTS.PLANE_LENGTH - CONSTANTS.PADDING) / 2];
-  console.log(xPositionValues);
   const xPosition =
     xPositionValues[getRandomInteger(0, xPositionValues.length - 1)];
   const yPosition = 3;
@@ -159,6 +163,10 @@ function createCactus() {
     zPositionValues[getRandomInteger(0, zPositionValues.length - 1)];
   cactus.render(GAME.scene, xPosition, yPosition, zPosition);
   GAME.obstacles.push(cactus);
+
+  const { MAX_INTERVAL, MIN_INTERVAL } = CONSTANTS;
+  const nextSpawn = Math.floor(Math.random() * (MAX_INTERVAL - MIN_INTERVAL + 1) + MIN_INTERVAL);
+  setTimeout(createCactus, nextSpawn * 700);
 }
 
 function getRandomInteger(min, max) {
