@@ -34,10 +34,14 @@ class Pterodactyl {
         new THREE.Face3(indices[i], indices[i + 1], indices[i + 2])
       );
     }
-
+    let mesh = new THREE.Mesh(pteroGeometry, material)
+    mesh.geometry.scale(5, 5, 5);
+    mesh.rotation.y = Math.PI*0.5;
+    mesh.position.x = mesh.position.x + 1.5;
+    mesh.position.y = mesh.position.y + 10;
     // scene.add(ptero);
-
-    this.object.add(new THREE.Mesh(pteroGeometry, material));
+    // console.log(mesh);
+    this.object.add(mesh);
   }
 
   render(scene) {
@@ -46,7 +50,7 @@ class Pterodactyl {
     loader.load(pteroTexture, this._createPtero.bind(this));
 
     scene.add(this.object);
-    this.object.scale.set(5, 5, 5);
+    
     this.wingPos += this.wingIter;
     if (this.wingPos <= 0) {
       this.wingIter = 15;

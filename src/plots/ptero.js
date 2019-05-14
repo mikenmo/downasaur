@@ -140,6 +140,7 @@ const ptero = function(wingsPos) {
     0,
     11,
     2,
+    
     11,
     2,
     12,

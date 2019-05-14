@@ -133,11 +133,10 @@ function main(mount) {
 
     GAME.scene.add(GAME.floor);
   });
-
+  
   createCactus();
+  // createPtero();
   const ptero = new Pterodactyl();
-  ptero.render(GAME.scene);
-
   GAME.player = new Hero();
   GAME.scene.add(
     GAME.camera,
@@ -146,6 +145,8 @@ function main(mount) {
     GAME.player
   );
   function animate() {
+    ptero.render(GAME.scene);
+   
     requestAnimationFrame(animate);
     GAME.obstacles.forEach(obstacle => {
       if (
@@ -185,6 +186,7 @@ function createCactus() {
   setTimeout(createCactus, nextSpawn * 700);
 }
 
+  
 function getRandomInteger(min, max) {
   return Math.floor(Math.random() * (max - min + 1)) + min;
 }
