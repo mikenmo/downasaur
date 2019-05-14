@@ -17,7 +17,11 @@ const CONSTANTS = {
   PADDING: 20,
 
   MIN_INTERVAL: 3,
-  MAX_INTERVAL: 10
+  MAX_INTERVAL: 10,
+
+  JUMP_TRAJECTION: 15,
+  JUMP_DURATION: 200,
+  JUMP_REFRESH: 10,
 };
 
 const GAME = {
@@ -41,7 +45,8 @@ const GAME = {
 function createPlayer() {
   const player = new Downasaur();
   player.render(GAME.scene, 0.785, 5, CONSTANTS.PLANE_LENGTH / 2);
-  window.addEventListener("keydown", function() {
+
+  window.addEventListener("keydown", function(event) {
     if (
       event.keyCode === 37 &&
       player.object.position.x !==
@@ -56,6 +61,22 @@ function createPlayer() {
     ) {
       player.object.position.x +=
         (CONSTANTS.PLANE_WIDTH - CONSTANTS.PADDING) / 2;
+    } else if (event.keyCode === 38 && player.object.position.y === 5) {
+      let elapsed = 0;
+      const jump = setInterval(function() {
+        const delta = CONSTANTS.JUMP_TRAJECTION / (CONSTANTS.JUMP_DURATION / CONSTANTS.JUMP_REFRESH) * 2;
+
+        if (elapsed < CONSTANTS.JUMP_DURATION / 2) {
+          player.object.position.y += delta;
+        } else {
+          player.object.position.y -= delta;
+
+          if (player.object.position.y === 5) clearInterval(jump);
+        }
+
+        elapsed += CONSTANTS.JUMP_REFRESH;
+        GAME.player.boundingBox = new THREE.Box3().setFromObject(player.object);
+      }, CONSTANTS.JUMP_REFRESH);
     }
 
     GAME.player.boundingBox = new THREE.Box3().setFromObject(player.object);
