@@ -35,7 +35,7 @@ class Pterodactyl {
       );
     }
     let mesh = new THREE.Mesh(pteroGeometry, material)
-    mesh.geometry.scale(5, 5, 5);
+    mesh.geometry.scale(5, 5, 7.5);
     mesh.rotation.y = Math.PI*0.5;
     mesh.position.x = mesh.position.x + 1.5;
     mesh.position.y = mesh.position.y + 10;

@@ -87,7 +87,7 @@ const ptero = function(wingsPos) {
     -0.4,
     -0.1,
     0.7 - wingsPos * 0.01,
-    -1.0 - wingsPos * 0.01,
+    -0.6 - wingsPos * 0.01,
 
     //wing
     0.0,
@@ -98,7 +98,7 @@ const ptero = function(wingsPos) {
     0.0,
     -0.1,
     0.7 - wingsPos * 0.01,
-    0.6 + wingsPos * 0.01
+    0.2 + wingsPos * 0.01
   ];
 
   let indices = [
