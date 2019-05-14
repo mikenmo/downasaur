@@ -2,6 +2,7 @@ import { mat4 } from "gl-matrix";
 import * as THREE from "three";
 import { initGraphics } from "./utils";
 import { Bird } from "./objects";
+import OrbitControls from "three-orbitcontrols";
 
 var Colors = {
   red: 0xf25346,
@@ -13,14 +14,16 @@ var Colors = {
 };
 
 function main() {
+  const { renderer } = initGraphics();
   const scene = new THREE.Scene();
   const camera = new THREE.PerspectiveCamera(
     75,
     window.innerWidth / window.innerHeight,
     0.1,
-    1000
+    100
   );
-  const { renderer } = initGraphics();
+  camera.position.set(0, 20, 100);
+  camera.position.z = 5;
   renderer.setSize(window.innerWidth, window.innerHeight);
   document.body.appendChild(renderer.domElement);
 
@@ -127,9 +130,12 @@ function main() {
   // var cube = new THREE.Mesh(geometry, material);
   // scene.add(cube);
   camera.position.set(10,1,10);
+  const controls = new OrbitControls(camera, renderer.domElement);
+  controls.update();
 
   function animate() {
     requestAnimationFrame(animate);
+    controls.update();
     renderer.render(scene, camera);
   }
   animate();
