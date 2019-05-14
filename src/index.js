@@ -2,6 +2,7 @@ import { mat4 } from "gl-matrix";
 import * as THREE from "three";
 import { initGraphics } from "./utils";
 import { Bird } from "./objects";
+import OrbitControls from "three-orbitcontrols";
 
 var Colors = {
   red: 0xf25346,
@@ -13,38 +14,25 @@ var Colors = {
 };
 
 function main() {
+  const { renderer } = initGraphics();
   const scene = new THREE.Scene();
   const camera = new THREE.PerspectiveCamera(
     75,
     window.innerWidth / window.innerHeight,
     0.1,
-    1000
+    100
   );
-  const { renderer } = initGraphics();
+  camera.position.set(0, 20, 100);
+  camera.position.z = 5;
   renderer.setSize(window.innerWidth, window.innerHeight);
   document.body.appendChild(renderer.domElement);
 
-  // const mesh = new THREE.Object3D();
-
-  var geomCockpit = new THREE.BoxGeometry(60, 50, 50, 1, 1, 1);
-  var material = new THREE.MeshBasicMaterial({
-    color: 0x00ff00
-  });
-  var cockpit = new THREE.Mesh(geomCockpit, material);
-  // cockpit.scale.set(0.25, 0.25, 0.25);
-  // cockpit.position.y = 100;
-  scene.add(cockpit);
-
-  // var geometry = new THREE.BoxGeometry(1, 1, 1);
-  // var material = new THREE.MeshBasicMaterial({
-  //   color: 0x00ff00
-  // });
-  // var cube = new THREE.Mesh(geometry, material);
-  // scene.add(cube);
-  camera.position.z = 5;
+  const controls = new OrbitControls(camera, renderer.domElement);
+  controls.update();
 
   function animate() {
     requestAnimationFrame(animate);
+    controls.update();
     renderer.render(scene, camera);
   }
   animate();
