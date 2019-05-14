@@ -1,51 +1,66 @@
-import { Cactus as Plant, Pot, Soil } from '../plots';
+import * as THREE from 'three';
+import { createBoxMesh, Colors } from '../utils';
 
-import { drawObject, createTexture } from '../utils';
-
-import brickImage from '../textures/brick.png';
-import grassImage from '../textures/grass.png';
-import soilImage from '../textures/soil.png';
+import grass from '../textures/grass.png';
+import brick from '../textures/brick.png';
+import soil from '../textures/soil.png';
 
 class Cactus {
-  constructor(gl, attribPointer) {
+  constructor() {
     this.x = 0;
     this.y = 0;
 
-    this.gl = gl;
-    this.attribPointer = attribPointer;
+    this.object = new THREE.Object3D();
   }
 
-  get coordinates() {
-    return { x: this.x, y: this.y };
+  _createPlant(texture) {
+    const material = { map: texture };
+
+    const mesh = createBoxMesh([
+      { geometry: [3.5, 13, 3.5], material, transform: { y: -1.5 }},
+
+      { geometry: [4, 1.75, 2], material, transform: { x: 3.5, y: 0.5 }},
+      { geometry: [2, 4, 2], material, transform: { x: 4.5, y: 3.4 }},
+
+      { geometry: [4, 1.75, 2], material, transform: { x: -3.5, y: -1.5 }},
+      { geometry: [2, 4, 2], material, transform: { x: -4.5, y: 1.4 }},
+    ]);
+
+    this.object.add(...mesh);
   }
 
-  render() {
-    const { gl, attribPointer } = this;
+  _createPot(texture) {
+    const material = { map: texture };
 
-    const grassTexture = createTexture(gl, attribPointer, grassImage);
-    const brickTexture = createTexture(gl, attribPointer, brickImage);
-    const soilTexture = createTexture(gl, attribPointer, soilImage);
+    const mesh = createBoxMesh([
+      { geometry: [12, 5, 2], material, transform: { y: -7.5, z: 6 }},
+      { geometry: [12, 5, 2], material, transform: { y: -7.5, z: -6 }},
+      { geometry: [2, 5, 13.75], material, transform: { y: -7.5, x: 5 }},
+      { geometry: [2, 5, 13.75], material, transform: { y: -7.5, x: -5 }},
+    ]);
 
-    grassTexture.addEventListener('load', function() {
-      gl.pixelStorei(gl.UNPACK_FLIP_Y_WEBGL, 1);
-      gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGB, gl.RGB, gl.UNSIGNED_BYTE, this);
+    this.object.add(...mesh);
+  }
 
-      drawObject(gl, attribPointer, { vertices: Plant });
-    });
+  _createSoil(texture) {
+    const geometry = new THREE.PlaneGeometry(10, 10);
+    const material = new THREE.MeshBasicMaterial({ map: texture, side: THREE.DoubleSide });
+    const mesh = new THREE.Mesh(geometry, material);
 
-    brickTexture.addEventListener('load', function() {
-      gl.pixelStorei(gl.UNPACK_FLIP_Y_WEBGL, 1);
-      gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGB, gl.RGB, gl.UNSIGNED_BYTE, this);
+    mesh.rotation.x = Math.PI * 0.5;
+    mesh.position.y = -7.5;
 
-      drawObject(gl, attribPointer, { vertices: Pot });
-    });
+    this.object.add(mesh);
+  }
 
-    soilTexture.addEventListener('load', function() {
-      gl.pixelStorei(gl.UNPACK_FLIP_Y_WEBGL, 1);
-      gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGB, gl.RGB, gl.UNSIGNED_BYTE, this);
+  render(scene) {
+    const loader = new THREE.TextureLoader();
 
-      drawObject(gl, attribPointer, { vertices: Soil });
-    });
+    loader.load(grass, this._createPlant.bind(this));
+    loader.load(brick, this._createPot.bind(this));
+    loader.load(soil, this._createSoil.bind(this));
+
+    scene.add(this.object);
   }
 }
 
