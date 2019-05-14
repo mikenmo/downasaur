@@ -23,6 +23,7 @@
   },
   "dependencies": {
     "gl-matrix": "^3.0.0",
+    "three": "^0.104.0",
     "webgl-debug": "^2.0.1",
     "webgl-utils": "^1.0.1"
   }
