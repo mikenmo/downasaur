@@ -97,7 +97,7 @@ function main() {
 
 function renderArt(gl, attribPointer, config) {
   // let vertices, colorSeq;
-
+  let wingsPos = 0
   // Model to World
   const modelMatrix = mat4.create();
   mat4.rotateX(modelMatrix, modelMatrix, toRadians(config.model.x));
@@ -160,9 +160,9 @@ function renderArt(gl, attribPointer, config) {
   const ptero = new Pterodactyl(gl, attribPointer);
   const downasaur = new Downasaur(gl, attribPointer);
 
-  // cactus.render();
-  // ptero.render();
-  downasaur.render();
+  cactus.render();
+  ptero.render(wingsPos,{x:0,y:0,z:0},0.25);
+  // downasaur.render();
 }
 
 main();
