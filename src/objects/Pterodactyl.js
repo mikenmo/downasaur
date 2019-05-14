@@ -7,7 +7,7 @@ class Pterodactyl {
   constructor(gl, attribPointer) {
     this.x = 0;
     this.y = 0;
-
+    this.z = 0;
     this.gl = gl;
     this.attribPointer = attribPointer;
   }
@@ -15,6 +15,7 @@ class Pterodactyl {
   static get coordinates() {
     return { x: this.x, y: this.y };
   }
+  
 
   render(wingsPos,translate,scale) {
     const { gl, attribPointer } = this;
