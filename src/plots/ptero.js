@@ -1,129 +1,201 @@
-import { createPolygonArray } from '../utils';
+import { createPolygonArray } from "../utils";
 
-const body = function(translate,scale) {
-    return(
-        createPolygonArray([
-            //head
-            { x: translate.x-240, y: translate.y+400, z: translate.z-80 }, //0
-            { x: translate.x-720, y: translate.y+0, z: translate.z-80 }, //1
-            { x: translate.x-320, y: translate.y+0, z: translate.z-80 }, //2
-            //neck
-            { x: translate.x-280, y: translate.y+200, z: translate.z-80 }, //3
-            { x: translate.x-320, y: translate.y+0, z: translate.z-80 }, //4
-            { x: translate.x-40, y: translate.y-80, z: translate.z-0 }, //5
-            
-            
+const ptero = function(wingsPos) {
+  let vertices = [
+    //FRONT
+    //head
+    -0.3,
+    0.5,
+    -0.1,
+    -0.9,
+    0.0,
+    -0.1,
+    -0.4,
+    0.0,
+    -0.1,
+    //neck
+    -0.35,
+    0.25,
+    -0.1,
+    -0.4,
+    0.0,
+    -0.1,
+    -0.05,
+    -0.1,
+    0.0,
+    0.1,
+    -0.5,
+    -0.1,
+    //body
+    -0.05,
+    -0.1,
+    0.0,
+    0.1,
+    -0.5,
+    -0.1,
+    0.9,
+    -0.1,
+    0.0,
+    0.7,
+    -0.5,
+    -0.1,
 
-            { x: translate.x-320, y: translate.y+0, z: translate.z-80 }, 
-            { x: translate.x-40, y: translate.y-80, z: translate.z-0 }, 
-            { x: translate.x+80, y: translate.y-400, z: translate.z-80 }, //6
-            //body
-            { x: translate.x-40, y: translate.y-80, z: translate.z-0 }, //7
-            { x: translate.x+80, y: translate.y-400, z: translate.z-80 },//8
-            { x: translate.x+720, y: translate.y-80, z: translate.z-0 }, //9
-            
-            
-        
-            { x: translate.x+80, y: translate.y-400, z: translate.z-80 },
-            { x: translate.x+720, y: translate.y-80, z: translate.z-0 },
-            { x: translate.x+560, y: translate.y-400, z: translate.z-80 },//10
+    //BACK
+    //head
+    -0.3,
+    0.5,
+    -0.3,
+    -0.9,
+    0.0,
+    -0.3,
+    -0.4,
+    0.0,
+    -0.3,
+    //neck
+    -0.35,
+    0.25,
+    -0.3,
+    -0.4,
+    0.0,
+    -0.3,
+    -0.05,
+    -0.1,
+    -0.4,
+    0.1,
+    -0.5,
+    -0.3,
+    //body
+    -0.05,
+    -0.1,
+    -0.4,
+    0.1,
+    -0.5,
+    -0.3,
+    0.9,
+    -0.1,
+    -0.4,
+    0.7,
+    -0.5,
+    -0.3,
 
-            //BACK
-            //head
-            { x: translate.x-240, y: translate.y+400, z: translate.z-240 },//11
-            { x: translate.x-720, y: translate.y-0, z: translate.z-240 },//12
-            { x: translate.x-320, y: translate.y-0, z: translate.z-240 },//13
-            //neck
-            { x: translate.x-280, y: translate.y+200, z: translate.z-240 },//14
-            { x: translate.x-320, y: translate.y-0, z: translate.z-240 },//15
-            { x: translate.x-40, y: translate.y-80, z: translate.z-320 },//16
-            
-            
+    //wing
+    0.0,
+    -0.1,
+    -0.4,
+    0.5,
+    -0.1,
+    -0.4,
+    -0.1,
+    0.7 - wingsPos * 0.01,
+    -1.0 - wingsPos * 0.01,
 
-            { x: translate.x-320, y: translate.y-0, z: translate.z-240 },
-            { x: translate.x-40, y: translate.y-80, z: translate.z-320 },
-            { x: translate.x+80, y: translate.y-400, z: translate.z-240 },//17
-            //body
-            { x: translate.x-40, y: translate.y-80, z: translate.z-320 },//18
-            { x: translate.x+80, y: translate.y-400, z: translate.z-240 },//19
-            { x: translate.x+720, y: translate.y-80, z: translate.z-320 },//20
-            
-            
+    //wing
+    0.0,
+    -0.1,
+    0.0,
+    0.5,
+    -0.1,
+    0.0,
+    -0.1,
+    0.7 - wingsPos * 0.01,
+    0.6 + wingsPos * 0.01
+  ];
 
-            { x: translate.x+80, y: translate.y-400, z: translate.z-240 },
-            { x: translate.x+720, y: translate.y-80, z: translate.z-320 },
-            { x: translate.x+560, y: translate.y-400, z: translate.z-240 },//21
+  let indices = [
+    // indices of vertices forming triangles
+    //front
+    0,
+    1,
+    2,
+    3,
+    4,
+    5,
+    4,
+    5,
+    6,
+    7,
+    8,
+    9,
+    8,
+    9,
+    10,
+    //back
+    11,
+    12,
+    13,
+    14,
+    15,
+    16,
+    15,
+    16,
+    17,
+    18,
+    19,
+    20,
+    19,
+    20,
+    21,
+    //sides reuse other points
+    //head
+    0,
+    11,
+    2,
+    11,
+    2,
+    12,
+    1,
+    12,
+    2,
+    12,
+    2,
+    13,
+    0,
+    11,
+    3,
+    11,
+    3,
+    14,
+    //neck
+    3,
+    14,
+    5,
+    14,
+    5,
+    16,
+    4,
+    15,
+    6,
+    15,
+    6,
+    17,
+    //body
+    7,
+    18,
+    9,
+    18,
+    9,
+    20,
+    8,
+    19,
+    10,
+    19,
+    10,
+    21,
+    9,
+    20,
+    10,
+    20,
+    10,
+    21,
+    //wings
+    22,
+    23,
+    24,
+    25,
+    26,
+    27
+  ];
+  return { vertices, indices };
+};
 
-            // CENTER
-            // head
-            
-            { x: translate.x-240, y: translate.y+400, z: translate.z-240 },//11
-            { x: translate.x-240, y: translate.y+400, z: translate.z-80 }, //0
-            { x: translate.x-720, y: translate.y+0, z: translate.z-240 }, //2
-            
-
-            { x: translate.x-720, y: translate.y+0, z: translate.z-240 }, //2
-            { x: translate.x-240, y: translate.y+400, z: translate.z-80 },//11
-            { x: translate.x-720, y: translate.y+0, z: translate.z-80 },//12
-
-            { x: translate.x-720, y: translate.y+0, z: translate.z-80 }, //1
-            { x: translate.x-720, y: translate.y-0, z: translate.z-240 },//12
-            { x: translate.x-320, y: translate.y+0, z: translate.z-80 }, //2
-
-            { x: translate.x-720, y: translate.y-0, z: translate.z-240 },//12
-            { x: translate.x-320, y: translate.y+0, z: translate.z-80 }, //2
-            { x: translate.x-320, y: translate.y-0, z: translate.z-240 },//13
-
-            { x: translate.x-240, y: translate.y+400, z: translate.z-80 }, //0
-            { x: translate.x-240, y: translate.y+400, z: translate.z-240 },//11
-            { x: translate.x-280, y: translate.y+200, z: translate.z-80 }, //3
-
-            { x: translate.x-240, y: translate.y+400, z: translate.z-240 },//11
-            { x: translate.x-280, y: translate.y+200, z: translate.z-80 }, //3
-            { x: translate.x-280, y: translate.y+200, z: translate.z-240 },//14
-
-            { x: translate.x-280, y: translate.y+200, z: translate.z-80 }, //3
-            { x: translate.x-280, y: translate.y+200, z: translate.z-240 },//14
-            { x: translate.x-40, y: translate.y-80, z: translate.z-0 }, //5
-
-            { x: translate.x-280, y: translate.y+200, z: translate.z-240 },//14
-            { x: translate.x-40, y: translate.y-80, z: translate.z-0 }, //5
-            { x: translate.x-40, y: translate.y-80, z: translate.z-320 },//16
-
-            { x: translate.x-320, y: translate.y+0, z: translate.z-80 }, //4
-            { x: translate.x-320, y: translate.y-0, z: translate.z-240 },//15
-            { x: translate.x+80, y: translate.y-400, z: translate.z-80 }, //6
-
-            { x: translate.x-320, y: translate.y-0, z: translate.z-240 },//15
-            { x: translate.x+80, y: translate.y-400, z: translate.z-80 }, //6
-            { x: translate.x+80, y: translate.y-400, z: translate.z-240 },//17
-
-            { x: translate.x-40, y: translate.y-80, z: translate.z-0 }, //7
-            { x: translate.x-40, y: translate.y-80, z: translate.z-320 },//18
-            { x: translate.x+720, y: translate.y-80, z: translate.z-0 }, //9
-
-            { x: translate.x-40, y: translate.y-80, z: translate.z-320 },//18
-            { x: translate.x+720, y: translate.y-80, z: translate.z-0 }, //9
-            { x: translate.x+720, y: translate.y-80, z: translate.z-320 },//20
-
-            { x: translate.x-40, y: translate.y-80, z: translate.z-0 }, // 8
-            { x: translate.x+80, y: translate.y-400, z: translate.z-240 },//19
-            { x: translate.x+560, y: translate.y-400, z: translate.z-80 },//10
-
-            { x: translate.x+80, y: translate.y-400, z: translate.z-240 },//19
-            { x: translate.x+560, y: translate.y-400, z: translate.z-80 },//10
-            { x: translate.x+560, y: translate.y-400, z: translate.z-240 },//21
-
-            { x: translate.x+720, y: translate.y-80, z: translate.z-0 }, //9
-            { x: translate.x+720, y: translate.y-80, z: translate.z-320 },//20
-            { x: translate.x+560, y: translate.y-400, z: translate.z-80 },//10
-
-            { x: translate.x+720, y: translate.y-80, z: translate.z-320 },//20
-            { x: translate.x+560, y: translate.y-400, z: translate.z-80 },//10
-            { x: translate.x+560, y: translate.y-400, z: translate.z-240 },//21
-        
-        ]).map(x => x * scale)
-    );
-}
-
-export default body;
+export default ptero;

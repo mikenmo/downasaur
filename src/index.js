@@ -2,14 +2,14 @@ import { mat4 } from "gl-matrix";
 import * as THREE from "three";
 
 import { initGraphics, Colors } from "./utils";
-import { Bird, Cactus } from "./objects";
+import { Pterodactyl, Cactus } from "./objects";
 import OrbitControls from "three-orbitcontrols";
 
 import renderHTML from "./html";
 import "./stylesheets/fonts.css";
 import "./stylesheets/index.css";
 
-import floorTexture from './textures/floor.jpg';
+import floorTexture from "./textures/floor.jpg";
 
 const CONSTANTS = {
   PLANE_WIDTH: 50,
@@ -17,7 +17,7 @@ const CONSTANTS = {
   PADDING: 20,
 
   MIN_INTERVAL: 3,
-  MAX_INTERVAL: 10,
+  MAX_INTERVAL: 10
 };
 
 const GAME = {
@@ -96,13 +96,13 @@ function main(mount) {
   );
 
   GAME.controls = new OrbitControls(GAME.camera, GAME.renderer.domElement);
-  GAME.controls.enableKeys = false;
-  GAME.controls.enablePan = false;
-  GAME.controls.enableZoom = false;
-  GAME.controls.minPolarAngle = 1.55;
-  GAME.controls.maxPolarAngle = 1.55;
-  GAME.controls.minAzimuthAngle = 0;
-  GAME.controls.maxAzimuthAngle = 0;
+  // GAME.controls.enableKeys = false;
+  // GAME.controls.enablePan = false;
+  // GAME.controls.enableZoom = false;
+  // GAME.controls.minPolarAngle = 1.55;
+  // GAME.controls.maxPolarAngle = 1.55;
+  // GAME.controls.minAzimuthAngle = 0;
+  // GAME.controls.maxAzimuthAngle = 0;
 
   // LIGHTING
   GAME.light.directional = new THREE.DirectionalLight(0xffffff, 1);
@@ -125,7 +125,7 @@ function main(mount) {
     );
     const floorMaterial = new THREE.MeshPhongMaterial({
       // color: 0x7b1113
-      map: texture,
+      map: texture
     });
     GAME.floor = new THREE.Mesh(floorGeometry, floorMaterial);
     GAME.floor.rotation.x = 1.57;
@@ -133,8 +133,10 @@ function main(mount) {
 
     GAME.scene.add(GAME.floor);
   });
-  
+
   createCactus();
+  const ptero = new Pterodactyl();
+  ptero.render(GAME.scene);
 
   GAME.player = new Hero();
   GAME.scene.add(
@@ -177,7 +179,9 @@ function createCactus() {
   GAME.obstacles.push(cactus);
 
   const { MAX_INTERVAL, MIN_INTERVAL } = CONSTANTS;
-  const nextSpawn = Math.floor(Math.random() * (MAX_INTERVAL - MIN_INTERVAL + 1) + MIN_INTERVAL);
+  const nextSpawn = Math.floor(
+    Math.random() * (MAX_INTERVAL - MIN_INTERVAL + 1) + MIN_INTERVAL
+  );
   setTimeout(createCactus, nextSpawn * 700);
 }
 
