@@ -11,6 +11,7 @@ class Cactus {
     this.y = 0;
 
     this.object = new THREE.Object3D();
+    this.boundingBox = new THREE.Box3().setFromObject(this.object);
   }
 
   _createPlant(texture) {
@@ -58,14 +59,17 @@ class Cactus {
 
   render(scene, x, y, z) {
     const loader = new THREE.TextureLoader();
+
     loader.load(grass, this._createPlant.bind(this));
     loader.load(brick, this._createPot.bind(this));
     loader.load(soil, this._createSoil.bind(this));
+
     this.object.castShadow = true;
     this.object.receiveShadow = true;
     this.object.position.x = x;
     this.object.position.y = y + 5;
     this.object.position.z = z;
+
     scene.add(this.object);
   }
 }

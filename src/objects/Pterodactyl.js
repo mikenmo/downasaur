@@ -57,6 +57,8 @@ class Pterodactyl {
     } else if (this.wingPos >= 100) {
       this.wingIter = -15;
     }
+
+    this.boundingBox = new THREE.Box3().setFromObject(this.object);
   }
 }
 

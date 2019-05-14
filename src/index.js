@@ -34,7 +34,8 @@ const GAME = {
   light: {
     directional: null,
     hemishphere: null
-  }
+  },
+  isPlaying: true,
 };
 
 function Hero() {
@@ -42,6 +43,7 @@ function Hero() {
     heroGeometry = {},
     heroMaterial = {};
 
+  const heroObject = new THREE.Object3D();
   heroGeometry = new THREE.CylinderGeometry(0, 2, 5, 10);
   heroMaterial = new THREE.MeshLambertMaterial({
     color: 0xe91e63,
@@ -51,6 +53,9 @@ function Hero() {
   hero.castShadow = true;
   hero.position.set(0, 5, CONSTANTS.PLANE_LENGTH / 2);
   hero.rotation.x = 0.785;
+  hero.boundingBox = new THREE.Box3().setFromObject(hero);
+
+  heroObject.add(hero);
 
   window.addEventListener("keydown", function() {
     if (
@@ -64,6 +69,8 @@ function Hero() {
     ) {
       hero.position.x += (CONSTANTS.PLANE_WIDTH - CONSTANTS.PADDING) / 2;
     }
+
+    hero.boundingBox = new THREE.Box3().setFromObject(hero);
   });
 
   return hero;
@@ -147,17 +154,24 @@ function main(mount) {
   function animate() {
     ptero.render(GAME.scene);
    
-    requestAnimationFrame(animate);
-    GAME.obstacles.forEach(obstacle => {
-      if (
-        obstacle.object.position.z <
-        CONSTANTS.PLANE_LENGTH / 2 + CONSTANTS.PLANE_LENGTH / 10
-      ) {
-        obstacle.object.position.z += 20;
-      }
-    });
-    GAME.controls.update();
-    GAME.renderer.render(GAME.scene, GAME.camera);
+    if (GAME.isPlaying) {
+      requestAnimationFrame(animate);
+      GAME.obstacles.forEach(obstacle => {
+        if (
+          obstacle.object.position.z <
+          CONSTANTS.PLANE_LENGTH / 2 + CONSTANTS.PLANE_LENGTH / 10
+        ) {
+          obstacle.object.position.z += 20;
+
+          const bounds = new THREE.Box3().setFromObject(obstacle.object);
+          if (bounds.intersectsBox(GAME.player.boundingBox)) {
+            GAME.isPlaying = false;
+          }
+        }
+      });
+      GAME.controls.update();
+      GAME.renderer.render(GAME.scene, GAME.camera);
+    }
   }
   animate();
 }
