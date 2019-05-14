@@ -10,6 +10,15 @@ export const Color = {
   GREEN: cvtColor(8, 57, 14),
 };
 
+export const Colors = {
+  red: 0xf25346,
+  white: 0xd8d0d1,
+  brown: 0x59332e,
+  pink: 0xf5986e,
+  brownDark: 0x23190f,
+  blue: 0x68c3c0
+};
+
 export const addVertexColoring = (vertices, colors) => {
   return vertices.reduce((data, vertex, i) => {
     data.push(vertex);
