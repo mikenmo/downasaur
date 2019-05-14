@@ -9,6 +9,8 @@ import renderHTML from "./html";
 import "./stylesheets/fonts.css";
 import "./stylesheets/index.css";
 
+import floorTexture from './textures/floor.jpg';
+
 const CONSTANTS = {
   PLANE_WIDTH: 50,
   PLANE_LENGTH: 1000,
@@ -109,17 +111,28 @@ function main(mount) {
   GAME.light.hemisphere.position.y = 500;
 
   // FLOOR
-  const floorGeometry = new THREE.BoxGeometry(
-    CONSTANTS.PLANE_WIDTH,
-    CONSTANTS.PLANE_LENGTH + CONSTANTS.PLANE_LENGTH / 10,
-    1
-  );
-  const floorMaterial = new THREE.MeshPhongMaterial({
-    color: 0x7b1113
+  const loader = new THREE.TextureLoader();
+
+  loader.load(floorTexture, texture => {
+    texture.wrapS = THREE.RepeatWrapping;
+    texture.wrapT = THREE.RepeatWrapping;
+    texture.repeat.set(10, 70);
+
+    const floorGeometry = new THREE.BoxGeometry(
+      CONSTANTS.PLANE_WIDTH,
+      CONSTANTS.PLANE_LENGTH + CONSTANTS.PLANE_LENGTH / 10,
+      1
+    );
+    const floorMaterial = new THREE.MeshPhongMaterial({
+      // color: 0x7b1113
+      map: texture,
+    });
+    GAME.floor = new THREE.Mesh(floorGeometry, floorMaterial);
+    GAME.floor.rotation.x = 1.57;
+    GAME.floor.receiveShadow = true;
+
+    GAME.scene.add(GAME.floor);
   });
-  GAME.floor = new THREE.Mesh(floorGeometry, floorMaterial);
-  GAME.floor.rotation.x = 1.57;
-  GAME.floor.receiveShadow = true;
   
   createCactus();
 
@@ -128,7 +141,6 @@ function main(mount) {
     GAME.camera,
     GAME.light.directional,
     GAME.light.hemisphere,
-    GAME.floor,
     GAME.player
   );
   function animate() {
