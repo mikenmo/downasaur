@@ -12,7 +12,7 @@ import {
   SCALING,
 } from './utils';
 
-import { Cactus, Pterodactyl } from './objects';
+import { Cactus, Pterodactyl, Downasaur } from './objects';
 
 const toRadians = theta => theta * Math.PI / 180;
 
@@ -158,9 +158,11 @@ function renderArt(gl, attribPointer, config) {
 
   const cactus = new Cactus(gl, attribPointer);
   const ptero = new Pterodactyl(gl, attribPointer);
+  const downasaur = new Downasaur(gl, attribPointer);
 
-  cactus.render();
-  ptero.render();
+  // cactus.render();
+  // ptero.render();
+  downasaur.render();
 }
 
 main();
