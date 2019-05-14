@@ -1,8 +1,8 @@
 import { mat4 } from "gl-matrix";
 import * as THREE from "three";
 
-import { initGraphics } from "./utils";
-import { Bird } from "./objects";
+import { initGraphics, Colors } from "./utils";
+import { Bird, Cactus } from "./objects";
 import OrbitControls from "three-orbitcontrols";
 
 import renderHTML from "./html";
@@ -25,18 +25,11 @@ const GAME = {
   floor: null,
   containerWidth: 0,
   containerHeight: 0,
+  obstacles: [],
   light: {
     directional: null,
     hemishphere: null
   }
-};
-const Colors = {
-  red: 0xf25346,
-  white: 0xd8d0d1,
-  brown: 0x59332e,
-  pink: 0xf5986e,
-  brownDark: 0x23190f,
-  blue: 0x68c3c0
 };
 
 function Hero() {
@@ -73,8 +66,8 @@ function Hero() {
 
 function main(mount) {
   const container = document.getElementById("root");
-  GAME.containerWidth = 1024 * 4;
-  GAME.containerHeight = 768 * 4;
+  GAME.containerWidth = window.innerWidth;
+  GAME.containerHeight = window.innerHeight;
   GAME.renderer = initGraphics().renderer;
   GAME.renderer.setSize(GAME.containerWidth, GAME.containerHeight);
   GAME.renderer.setClearColor(0xfffafa, 1);
@@ -84,7 +77,6 @@ function main(mount) {
   GAME.scene = new THREE.Scene();
 
   GAME.axesHelper = new THREE.AxesHelper(CONSTANTS.PLANE_LENGTH / 2);
-  console.log(GAME);
   // CAMERA
   GAME.camera = new THREE.PerspectiveCamera(
     45,
@@ -99,9 +91,9 @@ function main(mount) {
   );
 
   GAME.controls = new OrbitControls(GAME.camera, GAME.renderer.domElement);
-  // GAME.controls.enableKeys = false;
-  // GAME.controls.enablePan = false;
-  // GAME.controls.enableZoom = false;
+  GAME.controls.enableKeys = false;
+  GAME.controls.enablePan = false;
+  GAME.controls.enableZoom = false;
   GAME.controls.minPolarAngle = 1.55;
   GAME.controls.maxPolarAngle = 1.55;
   GAME.controls.minAzimuthAngle = 0;
@@ -123,8 +115,9 @@ function main(mount) {
     color: 0x7b1113
   });
   GAME.floor = new THREE.Mesh(floorGeometry, floorMaterial);
-  GAME.floor.rotation.x = 1.58;
-  // GAME.floor.receiveShadow = true;
+  GAME.floor.rotation.x = 1.57;
+  GAME.floor.receiveShadow = true;
+  createCactus();
   GAME.player = new Hero();
   GAME.scene.add(
     GAME.camera,
@@ -135,10 +128,40 @@ function main(mount) {
   );
   function animate() {
     requestAnimationFrame(animate);
+    GAME.obstacles.forEach(obstacle => {
+      if (
+        obstacle.object.position.z <
+        CONSTANTS.PLANE_LENGTH / 2 + CONSTANTS.PLANE_LENGTH / 10
+      ) {
+        obstacle.object.position.z += 10;
+      }
+    });
     GAME.controls.update();
     GAME.renderer.render(GAME.scene, GAME.camera);
   }
   animate();
 }
 
+function createCactus() {
+  const cactus = new Cactus();
+
+  const xPositionValues = [
+    -(CONSTANTS.PLANE_WIDTH - CONSTANTS.PADDING) / 2,
+    0,
+    (CONSTANTS.PLANE_WIDTH - CONSTANTS.PADDING) / 2
+  ];
+  const zPositionValues = [-(CONSTANTS.PLANE_LENGTH - CONSTANTS.PADDING) / 2];
+  console.log(xPositionValues);
+  const xPosition =
+    xPositionValues[getRandomInteger(0, xPositionValues.length - 1)];
+  const yPosition = 3;
+  const zPosition =
+    zPositionValues[getRandomInteger(0, zPositionValues.length - 1)];
+  cactus.render(GAME.scene, xPosition, yPosition, zPosition);
+  GAME.obstacles.push(cactus);
+}
+
+function getRandomInteger(min, max) {
+  return Math.floor(Math.random() * (max - min + 1)) + min;
+}
 renderHTML(main);
