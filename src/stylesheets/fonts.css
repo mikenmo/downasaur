@@ -1,9 +1,9 @@
 @font-face {
   font-family: 'Gulkave';
-  src: url('./fonts/gulkave.ttf') format('truetype');
+  src: url('./assets/fonts/gulkave.ttf') format('truetype');
 }
 
 @font-face {
   font-family: 'Silom';
-  src: url('./fonts/silom.ttf') format('truetype');
+  src: url('./assets/fonts/silom.ttf') format('truetype');
 }
