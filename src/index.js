@@ -57,6 +57,8 @@ function createPlayer() {
       player.object.position.x +=
         (CONSTANTS.PLANE_WIDTH - CONSTANTS.PADDING) / 2;
     }
+
+    GAME.player.boundingBox = new THREE.Box3().setFromObject(player.object);
   });
   return player;
 }
