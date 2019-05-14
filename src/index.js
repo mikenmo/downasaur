@@ -2,7 +2,7 @@ import { mat4 } from "gl-matrix";
 import * as THREE from "three";
 
 import { initGraphics, Colors } from "./utils";
-import { Pterodactyl, Cactus } from "./objects";
+import { Pterodactyl, Cactus, Downasaur } from "./objects";
 import OrbitControls from "three-orbitcontrols";
 
 import renderHTML, { renderScore } from "./html";
@@ -35,45 +35,30 @@ const GAME = {
     directional: null,
     hemishphere: null
   },
-  isPlaying: true,
+  isPlaying: true
 };
 
-function Hero() {
-  var hero = {},
-    heroGeometry = {},
-    heroMaterial = {};
-
-  const heroObject = new THREE.Object3D();
-  heroGeometry = new THREE.CylinderGeometry(0, 2, 5, 10);
-  heroMaterial = new THREE.MeshLambertMaterial({
-    color: 0xe91e63,
-    shading: THREE.FlatShading
-  });
-  hero = new THREE.Mesh(heroGeometry, heroMaterial);
-  hero.castShadow = true;
-  hero.position.set(0, 5, CONSTANTS.PLANE_LENGTH / 2);
-  hero.rotation.x = 0.785;
-  hero.boundingBox = new THREE.Box3().setFromObject(hero);
-
-  heroObject.add(hero);
-
+function createPlayer() {
+  const player = new Downasaur();
+  player.render(GAME.scene, 0.785, 5, CONSTANTS.PLANE_LENGTH / 2);
   window.addEventListener("keydown", function() {
     if (
       event.keyCode === 37 &&
-      hero.position.x !== -(CONSTANTS.PLANE_WIDTH - CONSTANTS.PADDING) / 2
+      player.object.position.x !==
+        -(CONSTANTS.PLANE_WIDTH - CONSTANTS.PADDING) / 2
     ) {
-      hero.position.x -= (CONSTANTS.PLANE_WIDTH - CONSTANTS.PADDING) / 2;
+      player.object.position.x -=
+        (CONSTANTS.PLANE_WIDTH - CONSTANTS.PADDING) / 2;
     } else if (
       event.keyCode === 39 &&
-      hero.position.x !== (CONSTANTS.PLANE_WIDTH - CONSTANTS.PADDING) / 2
+      player.object.position.x !==
+        (CONSTANTS.PLANE_WIDTH - CONSTANTS.PADDING) / 2
     ) {
-      hero.position.x += (CONSTANTS.PLANE_WIDTH - CONSTANTS.PADDING) / 2;
+      player.object.position.x +=
+        (CONSTANTS.PLANE_WIDTH - CONSTANTS.PADDING) / 2;
     }
-
-    hero.boundingBox = new THREE.Box3().setFromObject(hero);
   });
-
-  return hero;
+  return player;
 }
 
 function main(mount) {
@@ -142,21 +127,16 @@ function main(mount) {
 
     GAME.scene.add(GAME.floor);
   });
-  
+
   createCactus();
   // createPtero();
   const ptero = new Pterodactyl();
-  GAME.player = new Hero();
-  GAME.scene.add(
-    GAME.camera,
-    GAME.light.directional,
-    GAME.light.hemisphere,
-    GAME.player
-  );
+  GAME.player = createPlayer();
+  GAME.scene.add(GAME.camera, GAME.light.directional, GAME.light.hemisphere);
 
   function animate() {
     ptero.render(GAME.scene);
-   
+
     if (GAME.isPlaying) {
       requestAnimationFrame(animate);
       GAME.obstacles.forEach(obstacle => {
@@ -205,7 +185,6 @@ function createCactus() {
   setTimeout(createCactus, nextSpawn * 700);
 }
 
-  
 function getRandomInteger(min, max) {
   return Math.floor(Math.random() * (max - min + 1)) + min;
 }
