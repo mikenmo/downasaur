@@ -17,10 +17,10 @@ const CONSTANTS = {
   PADDING: 20,
 
   MIN_INTERVAL: 3,
-  MAX_INTERVAL: 10,
+  MAX_INTERVAL: 5,
 
-  JUMP_TRAJECTION: 15,
-  JUMP_DURATION: 200,
+  JUMP_TRAJECTION: 20,
+  JUMP_DURATION: 500,
   JUMP_REFRESH: 10,
 };
 
@@ -50,14 +50,16 @@ function createPlayer() {
     if (
       event.keyCode === 37 &&
       player.object.position.x !==
-        -(CONSTANTS.PLANE_WIDTH - CONSTANTS.PADDING) / 2
+        -(CONSTANTS.PLANE_WIDTH - CONSTANTS.PADDING) / 2 &&
+      player.object.position.y <= 5
     ) {
       player.object.position.x -=
         (CONSTANTS.PLANE_WIDTH - CONSTANTS.PADDING) / 2;
     } else if (
       event.keyCode === 39 &&
       player.object.position.x !==
-        (CONSTANTS.PLANE_WIDTH - CONSTANTS.PADDING) / 2
+        (CONSTANTS.PLANE_WIDTH - CONSTANTS.PADDING) / 2 &&
+      player.object.position.y <= 5
     ) {
       player.object.position.x +=
         (CONSTANTS.PLANE_WIDTH - CONSTANTS.PADDING) / 2;
@@ -71,7 +73,11 @@ function createPlayer() {
         } else {
           player.object.position.y -= delta;
 
-          if (player.object.position.y === 5) clearInterval(jump);
+          if (player.object.position.y <= 5) {
+            clearInterval(jump);
+            elapsed = 0;
+            player.object.position.y = 5;
+          }
         }
 
         elapsed += CONSTANTS.JUMP_REFRESH;
