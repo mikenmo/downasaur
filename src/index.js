@@ -1,166 +1,167 @@
-import './stylesheets/index.css';
+import { mat4 } from "gl-matrix";
+import * as THREE from "three";
 
-import getAttribPointers from './pointers';
-import { mat4 } from 'gl-matrix';
-import {
-  initGraphics,
-  createVectorArray,
+import { initGraphics, Colors } from "./utils";
+import { Bird, Cactus } from "./objects";
+import OrbitControls from "three-orbitcontrols";
 
-  cvtColorObj,
+import renderHTML from "./html";
+import "./stylesheets/fonts.css";
+import "./stylesheets/index.css";
 
-  Color,
-  SCALING,
-} from './utils';
+const CONSTANTS = {
+  PLANE_WIDTH: 50,
+  PLANE_LENGTH: 1000,
+  PADDING: 20
+};
 
-import { Cactus, Pterodactyl } from './objects';
+const GAME = {
+  renderer: null,
+  scene: null,
+  axesHelper: null,
+  camera: null,
+  player: null,
+  controls: null,
+  floor: null,
+  containerWidth: 0,
+  containerHeight: 0,
+  obstacles: [],
+  light: {
+    directional: null,
+    hemishphere: null
+  }
+};
 
-const toRadians = theta => theta * Math.PI / 180;
+function Hero() {
+  var hero = {},
+    heroGeometry = {},
+    heroMaterial = {};
 
-function main() {
-  const { gl, program } = initGraphics('main', { width: 600, height: 600 });
-  const attribPointer = getAttribPointers(gl, program);
+  heroGeometry = new THREE.CylinderGeometry(0, 2, 5, 10);
+  heroMaterial = new THREE.MeshLambertMaterial({
+    color: 0xe91e63,
+    shading: THREE.FlatShading
+  });
+  hero = new THREE.Mesh(heroGeometry, heroMaterial);
+  hero.castShadow = true;
+  hero.position.set(0, 5, CONSTANTS.PLANE_LENGTH / 2);
+  hero.rotation.x = 0.785;
 
-  gl.enable(gl.DEPTH_TEST);
-  gl.enableVertexAttribArray(attribPointer.A_POSITION);
-  gl.enableVertexAttribArray(attribPointer.A_UV_COORD);
-  // gl.enableVertexAttribArray(attribPointer.A_NORMAL);
+  window.addEventListener("keydown", function() {
+    if (
+      event.keyCode === 37 &&
+      hero.position.x !== -(CONSTANTS.PLANE_WIDTH - CONSTANTS.PADDING) / 2
+    ) {
+      hero.position.x -= (CONSTANTS.PLANE_WIDTH - CONSTANTS.PADDING) / 2;
+    } else if (
+      event.keyCode === 39 &&
+      hero.position.x !== (CONSTANTS.PLANE_WIDTH - CONSTANTS.PADDING) / 2
+    ) {
+      hero.position.x += (CONSTANTS.PLANE_WIDTH - CONSTANTS.PADDING) / 2;
+    }
+  });
 
-  let transformationMatrix = mat4.create();
-
-  // Initialize transformation matrix
-  gl.uniformMatrix4fv(attribPointer.U_MODEL_MATRIX, false, new Float32Array(transformationMatrix));
-
-  /* Start program here */
-  const uModel = mat4.create();
-  const uNormal = mat4.create();
-
-  mat4.invert(uNormal, uModel);
-  mat4.transpose(uNormal, uNormal);
-
-  const config = {
-    model: { x: -40, y: -40, z: 0 },
-    cam: { x: 0, y: 0, z: 0 },
-    lap: { x: 0, y: 0, z: 0 },
-
-    lightambient: { r: 76, g: 76, b: 76 },
-    lightdiffuse: { r: 255, g: 255, b: 255 },
-    lightspecular: { r: 255, g: 255, b: 255 },
-    lightdirection: { x: -SCALING.x, y: SCALING.y * -2.5, z: SCALING.z * -5 },
-
-    materialambient: { r: 0, g: 0, b: 0 },
-    materialdiffuse: { r: 0, g: 0, b: 0 },
-    materialspecular: { r: 255, g: 255, b: 255 },
-    materialshininess: { v: 5 },
-
-    flags: {
-      ambient: true,
-      diffuse: true,
-      specular: true,
-    },
-    uNormal,
-    isAnimating: false,
-  };
-
-  // Bind Listeners
-  // const sliders = document.querySelectorAll('input[type=range]');
-  // sliders.forEach(slider => {
-  //   slider.addEventListener('input', e => {
-  //     const [className, feature, label] = e.target.name.match(/(\w+)-(\w)/);
-  //     const [units] = document.querySelectorAll(`.${className}`);
-  //     config[feature][label] = +e.target.value;
-  //     units.innerText = `${e.target.value}`;
-  //     renderArt(gl, attribPointer, config);
-  //   });
-  // });
-
-  // const animation = document.querySelector('input[type=checkbox]');
-  // animation.addEventListener('change', e => {
-  //   config.isAnimating = e.target.checked;
-  // });
-
-  // animate();
-  renderArt(gl, attribPointer, config);
-  
-  // function animate() {
-  //   renderArt(gl, attribPointer, config);
-
-  //   const { x } = config.model;
-
-  //   if (config.isAnimating) {
-  //     const theta = (x + 1) % 360;
-  //     config.model = { x: theta, y: theta, z: theta };
-  //   }
-
-  //   requestAnimFrame(animate);
-  // }
+  return hero;
 }
 
-function renderArt(gl, attribPointer, config) {
-  // let vertices, colorSeq;
-  let wingsPos = 0
-  // Model to World
-  const modelMatrix = mat4.create();
-  mat4.rotateX(modelMatrix, modelMatrix, toRadians(config.model.x));
-  mat4.rotateY(modelMatrix, modelMatrix, toRadians(config.model.y));
-  mat4.rotateZ(modelMatrix, modelMatrix, toRadians(config.model.z));
+function main(mount) {
+  const container = document.getElementById("root");
+  GAME.containerWidth = window.innerWidth;
+  GAME.containerHeight = window.innerHeight;
+  GAME.renderer = initGraphics().renderer;
+  GAME.renderer.setSize(GAME.containerWidth, GAME.containerHeight);
+  GAME.renderer.setClearColor(0xfffafa, 1);
+  GAME.renderer.shadowMap.enabled = true;
+  mount.appendChild(GAME.renderer.domElement);
 
-  gl.uniformMatrix4fv(attribPointer.U_MODEL_MATRIX, false, new Float32Array(modelMatrix));
+  GAME.scene = new THREE.Scene();
 
-  const viewMatrix = mat4.create();
-  const {
-    cam,
-    lap,
-
-    lightambient,
-    lightdiffuse,
-    lightspecular,
-    lightdirection,
-    materialambient,
-    materialdiffuse,
-    materialspecular,
-    materialshininess,
-
-    flags,
-    uNormal,
-  } = config;
-
-  mat4.lookAt(
-    viewMatrix,
-    createVectorArray({ x: cam.x, y: cam.y, z: cam.z }),
-    createVectorArray({ x: lap.x, y: lap.y, z: lap.z }),
-    [0, 1, 0, 0]
+  GAME.axesHelper = new THREE.AxesHelper(CONSTANTS.PLANE_LENGTH / 2);
+  // CAMERA
+  GAME.camera = new THREE.PerspectiveCamera(
+    45,
+    GAME.containerWidth / GAME.containerHeight,
+    1,
+    3000
   );
-  gl.uniformMatrix4fv(
-    attribPointer.U_VIEW_MATRIX,
-    false,
-    new Float32Array(viewMatrix)
+  GAME.camera.position.set(
+    0,
+    CONSTANTS.PLANE_LENGTH / 125,
+    CONSTANTS.PLANE_LENGTH / 2 + CONSTANTS.PLANE_LENGTH / 25
   );
 
-  // Setup Lighting Parameters
-  gl.uniformMatrix4fv(attribPointer.U_NORMAL_MATRIX, false, new Float32Array(uNormal));
+  GAME.controls = new OrbitControls(GAME.camera, GAME.renderer.domElement);
+  GAME.controls.enableKeys = false;
+  GAME.controls.enablePan = false;
+  GAME.controls.enableZoom = false;
+  GAME.controls.minPolarAngle = 1.55;
+  GAME.controls.maxPolarAngle = 1.55;
+  GAME.controls.minAzimuthAngle = 0;
+  GAME.controls.maxAzimuthAngle = 0;
 
-  gl.uniform3fv(attribPointer.U_LIGHT_AMBIENT, cvtColorObj(lightambient));
-  gl.uniform3fv(attribPointer.U_LIGHT_DIFFUSE, cvtColorObj(lightdiffuse));
-  gl.uniform3fv(attribPointer.U_LIGHT_SPECULAR, cvtColorObj(lightspecular));
-  gl.uniform3fv(attribPointer.U_LIGHT_DIRECTION, createVectorArray(lightdirection));
+  // LIGHTING
+  GAME.light.directional = new THREE.DirectionalLight(0xffffff, 1);
+  GAME.light.directional.position.set(0, 1, 0);
+  GAME.light.hemisphere = new THREE.HemisphereLight(0xffffff, 0xffffff, 1);
+  GAME.light.hemisphere.position.y = 500;
 
-  gl.uniform3fv(attribPointer.U_MATERIAL_AMBIENT, cvtColorObj(materialambient));
-  gl.uniform3fv(attribPointer.U_MATERIAL_DIFFUSE, cvtColorObj(materialdiffuse));
-  gl.uniform3fv(attribPointer.U_MATERIAL_SPECULAR, cvtColorObj(materialspecular));
-  gl.uniform1f(attribPointer.U_SHININESS, materialshininess.v);
-
-  gl.clearColor(...Color.BLACK);
-  gl.clearDepth(1.0);
-  gl.enable(gl.DEPTH_TEST);
-  gl.depthFunc(gl.LEQUAL);
-  gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);  
-
-
-  const cactus = new Cactus(gl, attribPointer);
-  const ptero = new Pterodactyl(gl, attribPointer);
-
-  cactus.render();
-  ptero.render(wingsPos,{x:0,y:0,z:0},0.25);
+  // FLOOR
+  const floorGeometry = new THREE.BoxGeometry(
+    CONSTANTS.PLANE_WIDTH,
+    CONSTANTS.PLANE_LENGTH + CONSTANTS.PLANE_LENGTH / 10,
+    1
+  );
+  const floorMaterial = new THREE.MeshPhongMaterial({
+    color: 0x7b1113
+  });
+  GAME.floor = new THREE.Mesh(floorGeometry, floorMaterial);
+  GAME.floor.rotation.x = 1.57;
+  GAME.floor.receiveShadow = true;
+  createCactus();
+  GAME.player = new Hero();
+  GAME.scene.add(
+    GAME.camera,
+    GAME.light.directional,
+    GAME.light.hemisphere,
+    GAME.floor,
+    GAME.player
+  );
+  function animate() {
+    requestAnimationFrame(animate);
+    GAME.obstacles.forEach(obstacle => {
+      if (
+        obstacle.object.position.z <
+        CONSTANTS.PLANE_LENGTH / 2 + CONSTANTS.PLANE_LENGTH / 10
+      ) {
+        obstacle.object.position.z += 10;
+      }
+    });
+    GAME.controls.update();
+    GAME.renderer.render(GAME.scene, GAME.camera);
+  }
+  animate();
 }
 
-main();
+function createCactus() {
+  const cactus = new Cactus();
+
+  const xPositionValues = [
+    -(CONSTANTS.PLANE_WIDTH - CONSTANTS.PADDING) / 2,
+    0,
+    (CONSTANTS.PLANE_WIDTH - CONSTANTS.PADDING) / 2
+  ];
+  const zPositionValues = [-(CONSTANTS.PLANE_LENGTH - CONSTANTS.PADDING) / 2];
+  console.log(xPositionValues);
+  const xPosition =
+    xPositionValues[getRandomInteger(0, xPositionValues.length - 1)];
+  const yPosition = 3;
+  const zPosition =
+    zPositionValues[getRandomInteger(0, zPositionValues.length - 1)];
+  cactus.render(GAME.scene, xPosition, yPosition, zPosition);
+  GAME.obstacles.push(cactus);
+}
+
+function getRandomInteger(min, max) {
+  return Math.floor(Math.random() * (max - min + 1)) + min;
+}
+renderHTML(main);

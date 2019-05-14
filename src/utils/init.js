@@ -1,28 +1,16 @@
-import { initWebGL, initShader, initProgram } from './webgl-init';
+import * as THREE from "three";
 
-import fragment from '../shaders/fragment.glsl';
-import vertex from '../shaders/vertex.glsl';
-
-const shader = { fragment, vertex };
-
-const initGraphics = (canvasId, canvasOptions = {}) => {
-  const canvas = document.getElementById(canvasId);
-
+const initGraphics = () => {
+  const canvas = document.createElement( 'canvas' );
+  
   if (!canvas) {
     throw Error('Canvas element is null');
   }
 
-  Object.assign(canvas, canvasOptions);
-
-  const gl = initWebGL(canvas, true);
-  const vertexShader = initShader(gl, gl.VERTEX_SHADER, shader.vertex);
-  const fragmentShader = initShader(gl, gl.FRAGMENT_SHADER, shader.fragment);
-  const program = initProgram(gl, vertexShader, fragmentShader);
-
-  // Init Canvas
-  gl.useProgram(program);
-
-  return { gl, vertexShader, fragmentShader, program };
+  const context = canvas.getContext( 'webgl2' );
+  const renderer = new THREE.WebGLRenderer( { canvas: canvas, context: context } );
+  
+  return { renderer };
 }
 
 export default initGraphics;

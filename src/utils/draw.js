@@ -1,3 +1,5 @@
+import * as THREE from "three";
+
 export const SCALING = { x: 800, y: 800, z: 800 };
 
 export const createVectorArray = points => {
@@ -72,4 +74,16 @@ export const drawObject = (gl, attribPointer, config, primitiveType) => {
   gl.bufferData(gl.ELEMENT_ARRAY_BUFFER, new Uint8Array(Array.from({ length: vertices.length / 5 }).map((_, i) => i)), gl.STATIC_DRAW)
 
   gl.drawElements(primitiveType, vertices.length / 5, gl.UNSIGNED_BYTE, 0)
+}
+
+export const createBoxMesh = points => {
+  return points.map(({ geometry, material, transform }) => {
+    const object = new THREE.BoxGeometry(...geometry);
+    const meshmaterial = new THREE.MeshBasicMaterial(material);
+    const mesh = new THREE.Mesh(object, meshmaterial);
+
+    if (transform) Object.assign(mesh.position, transform);
+
+    return mesh;
+  });
 }
