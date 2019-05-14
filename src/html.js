@@ -34,7 +34,8 @@ const renderHighScores = mount => {
 
 function renderHTML(callback) {
   const mountPoint = document.getElementById('root');
-  renderMenu(mountPoint, callback);
+  // renderMenu(mountPoint, callback);
+  callback(mountPoint);
 }
 
 export default renderHTML;
