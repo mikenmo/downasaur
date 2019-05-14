@@ -32,6 +32,14 @@ const renderHighScores = mount => {
   mount.innerHTML = html;
 };
 
+export const renderScore = score => {
+  const html = `
+    <div class="score-holder">${score}</div>
+  `;
+
+  document.getElementById('score').innerHTML = html;
+}
+
 function renderHTML(callback) {
   const mountPoint = document.getElementById("root");
   // renderMenu(mountPoint, callback);

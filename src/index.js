@@ -5,7 +5,7 @@ import { initGraphics, Colors } from "./utils";
 import { Pterodactyl, Cactus } from "./objects";
 import OrbitControls from "three-orbitcontrols";
 
-import renderHTML from "./html";
+import renderHTML, { renderScore } from "./html";
 import "./stylesheets/fonts.css";
 import "./stylesheets/index.css";
 
@@ -87,6 +87,8 @@ function main(mount) {
   mount.appendChild(GAME.renderer.domElement);
 
   GAME.scene = new THREE.Scene();
+  GAME.clock = new THREE.Clock();
+  GAME.score = 0;
 
   GAME.axesHelper = new THREE.AxesHelper(CONSTANTS.PLANE_LENGTH / 2);
   // CAMERA
@@ -151,6 +153,7 @@ function main(mount) {
     GAME.light.hemisphere,
     GAME.player
   );
+
   function animate() {
     ptero.render(GAME.scene);
    
@@ -162,6 +165,8 @@ function main(mount) {
           CONSTANTS.PLANE_LENGTH / 2 + CONSTANTS.PLANE_LENGTH / 10
         ) {
           obstacle.object.position.z += 20;
+          GAME.score = Math.floor(GAME.clock.getElapsedTime() * 15);
+          renderScore(GAME.score);
 
           const bounds = new THREE.Box3().setFromObject(obstacle.object);
           if (bounds.intersectsBox(GAME.player.boundingBox)) {

@@ -14,6 +14,15 @@ html {
   justify-content: center;
 }
 
+#score {
+  position: fixed;
+  left: 16px;
+  top: 16px;
+  color: black;
+  z-index: 5;
+  font-size: 48px;
+}
+
 .menu-wrapper {
   padding: 24px 32px;
   width: 90%;
