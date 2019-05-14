@@ -3,18 +3,12 @@ html {
   background-color: black;
   color: white;
   margin: 0;
-  font-family: 'Silom', monospace;
-}
-
-canvas {
-  height: 800px;
-  width: 800px;
-  background-color: white;
+  font-family: "Silom", monospace;
 }
 
 #root {
-  height: 100vh;
-  width: 100vw;
+  height: 100%;
+  width: 100%;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -28,7 +22,7 @@ canvas {
 }
 
 h1 {
-  font-family: 'Gulkave';
+  font-family: "Gulkave";
   margin: 0;
   font-size: 48px;
   margin-bottom: 32px;
@@ -44,7 +38,7 @@ h1 {
   border: 1px solid white;
   cursor: pointer;
   font-size: 32px;
-  font-family: 'Silom';
+  font-family: "Silom";
 }
 
 .button:hover {

@@ -8,19 +8,19 @@ const renderMenu = (mount, callback) => {
       <button class="button" id="devs">Developers</button>
     </div>
   `;
-  
+
   mount.innerHTML = html;
 
-  const play = document.getElementById('play');
-  const highscores = document.getElementById('highscores');
-  const devs = document.getElementById('devs');
+  const play = document.getElementById("play");
+  const highscores = document.getElementById("highscores");
+  const devs = document.getElementById("devs");
 
-  play.addEventListener('click', e => {
-    mount.innerHTML = '';
+  play.addEventListener("click", e => {
+    mount.innerHTML = "";
     callback(mount);
   });
-  highscores.addEventListener('click', e => renderHighScores(mount));
-}
+  highscores.addEventListener("click", e => renderHighScores(mount));
+};
 
 const renderHighScores = mount => {
   const html = `
@@ -30,12 +30,12 @@ const renderHighScores = mount => {
   `;
 
   mount.innerHTML = html;
-}
+};
 
 function renderHTML(callback) {
-  const mountPoint = document.getElementById('root');
-  // renderMenu(mountPoint, callback);
-  callback(mountPoint);
+  const mountPoint = document.getElementById("root");
+  renderMenu(mountPoint, callback);
+  // callback(mountPoint);
 }
 
 export default renderHTML;
