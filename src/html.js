@@ -56,7 +56,7 @@ export const gameOverScreen = (score) => {
 
   // Save score to localStorage
   const highScore = localStorage.getItem('highscore');
-  if (!highscore || highscore < score) localStorage.setItem('highscore', score);
+  if (!highScore || highScore < score) localStorage.setItem('highscore', score);
 
   mountPoint.insertAdjacentHTML('afterbegin', html);
   const button = document.getElementById('again');

@@ -48,18 +48,12 @@ function createPlayer() {
 
   window.addEventListener("keydown", function(event) {
     if (
-      event.keyCode === 37 &&
-      player.object.position.x !==
-        -(CONSTANTS.PLANE_WIDTH - CONSTANTS.PADDING) / 2 &&
-      player.object.position.y <= 5
+      event.keyCode === 37 && player.object.position.x > -14
     ) {
       player.object.position.x -=
         (CONSTANTS.PLANE_WIDTH - CONSTANTS.PADDING) / 2;
     } else if (
-      event.keyCode === 39 &&
-      player.object.position.x !==
-        (CONSTANTS.PLANE_WIDTH - CONSTANTS.PADDING) / 2 &&
-      player.object.position.y <= 5
+      event.keyCode === 39 && player.object.position.x < 15
     ) {
       player.object.position.x +=
         (CONSTANTS.PLANE_WIDTH - CONSTANTS.PADDING) / 2;
@@ -134,6 +128,7 @@ function main(mount) {
   // LIGHTING
   GAME.light.directional = new THREE.DirectionalLight(0xffffff, 1);
   GAME.light.directional.position.set(0, 1, 0);
+  // GAME.light.directional.castShadow = true;
   GAME.light.hemisphere = new THREE.HemisphereLight(0xffffff, 0xffffff, 1);
   GAME.light.hemisphere.position.y = 500;
 
@@ -184,7 +179,7 @@ function main(mount) {
 
           if (bounds.intersectsBox(GAME.player.boundingBox)) {
             GAME.isPlaying = false;
-            gameOverScreen(GAME.score);
+            gameOverScreen(GAME.score, main);
           }
         } else {
           GAME.scene.remove(obstacle.object);
