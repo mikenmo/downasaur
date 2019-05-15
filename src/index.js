@@ -5,7 +5,7 @@ import { initGraphics, Colors } from "./utils";
 import { Pterodactyl, Cactus, Downasaur } from "./objects";
 import OrbitControls from "three-orbitcontrols";
 
-import renderHTML, { renderScore } from "./html";
+import renderHTML, { renderScore, gameOverScreen } from "./html";
 import "./stylesheets/fonts.css";
 import "./stylesheets/index.css";
 
@@ -184,6 +184,7 @@ function main(mount) {
 
           if (bounds.intersectsBox(GAME.player.boundingBox)) {
             GAME.isPlaying = false;
+            gameOverScreen(GAME.score, main);
           }
         } else {
           GAME.scene.remove(obstacle.object);

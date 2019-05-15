@@ -40,6 +40,20 @@ export const renderScore = score => {
   document.getElementById('score').innerHTML = html;
 }
 
+export const gameOverScreen = (score, main) => {
+  const mountPoint = document.getElementById('root');
+  const html = `
+    <div class="overlay">
+      <h1>GAMEOVER!</h1>
+      <button class="button" id="again">Again</button>
+      <div class="showscore">Score: ${score}</div>
+    </div>
+  `;
+
+  mountPoint.insertAdjacentHTML('afterbegin', html);
+  document.getElementById('again', () => main(mountPoint));
+}
+
 function renderHTML(callback) {
   const mountPoint = document.getElementById("root");
   // renderMenu(mountPoint, callback);
