@@ -175,7 +175,6 @@ function main(mount) {
         ) {
           obstacle.z += 10;
           GAME.score = Math.floor(GAME.clock.getElapsedTime() * 15);
-          console.log(GAME.lightEnabled)
           if(parseInt(GAME.clock.getElapsedTime())%10 === 0 && GAME.lastLightChange != parseInt(GAME.clock.getElapsedTime())){
             GAME.lastLightChange = parseInt(GAME.clock.getElapsedTime())
             GAME.lightEnabled = !GAME.lightEnabled
