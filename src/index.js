@@ -191,7 +191,6 @@ function main(mount) {
         }
       }
       // GAME.controls.update();
-      console.log(GAME.obstacles.length);
       GAME.renderer.render(GAME.scene, GAME.camera);
     }
   }
