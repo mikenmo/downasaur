@@ -96,7 +96,7 @@ function main(mount) {
   GAME.containerHeight = window.innerHeight;
   GAME.renderer = initGraphics().renderer;
   GAME.renderer.setSize(GAME.containerWidth, GAME.containerHeight);
-  GAME.renderer.setClearColor(0xfffafa, 1);
+  GAME.renderer.setClearColor(0x000000, 1);
   GAME.renderer.shadowMap.enabled = true;
   mount.appendChild(GAME.renderer.domElement);
 
@@ -112,10 +112,11 @@ function main(mount) {
     1,
     3000
   );
+  GAME.camera.rotation.x = -15 * Math.PI / 180
   GAME.camera.position.set(
     0,
-    CONSTANTS.PLANE_LENGTH / 125,
-    CONSTANTS.PLANE_LENGTH / 2 + CONSTANTS.PLANE_LENGTH / 25
+    CONSTANTS.PLANE_LENGTH / 125+10,
+    CONSTANTS.PLANE_LENGTH / 2 + CONSTANTS.PLANE_LENGTH / 25 - 15
   );
 
   // GAME.controls = new OrbitControls(GAME.camera, GAME.renderer.domElement);
