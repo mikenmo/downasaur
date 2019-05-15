@@ -3,9 +3,10 @@ import * as THREE from "three";
 import pteroTexture from "../textures/ptero.png";
 import { Ptero } from "../plots";
 class Pterodactyl {
-  constructor() {
-    this.x = 0;
-    this.y = 0;
+  constructor(x,y,z) {
+    this.x = x;
+    this.y = y;
+    this.z = z;
 
     this.wingPos = 0;
     this.wingIter = 15;
@@ -35,10 +36,9 @@ class Pterodactyl {
       );
     }
     let mesh = new THREE.Mesh(pteroGeometry, material)
-    mesh.geometry.scale(5, 5, 7.5);
+    mesh.geometry.scale(5, 5, 7.5);    
     mesh.rotation.y = Math.PI*0.5;
-    mesh.position.x = mesh.position.x + 1.5;
-    mesh.position.y = mesh.position.y + 10;
+    
     // scene.add(ptero);
     // console.log(mesh);
     this.object.add(mesh);
@@ -46,9 +46,13 @@ class Pterodactyl {
 
   render(scene) {
     const loader = new THREE.TextureLoader();
-
+    
     loader.load(pteroTexture, this._createPtero.bind(this));
 
+    this.object.position.x = this.x + 2;
+    this.object.position.y = this.y + 15;
+    this.object.position.z = this.z;
+    
     scene.add(this.object);
     
     this.wingPos += this.wingIter;

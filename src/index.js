@@ -16,11 +16,11 @@ const CONSTANTS = {
   PLANE_LENGTH: 1000,
   PADDING: 20,
 
-  MIN_INTERVAL: 3,
-  MAX_INTERVAL: 10,
+  MIN_INTERVAL: 2,
+  MAX_INTERVAL: 5,
 
-  JUMP_TRAJECTION: 15,
-  JUMP_DURATION: 200,
+  JUMP_TRAJECTION: 20,
+  JUMP_DURATION: 400,
   JUMP_REFRESH: 10,
 };
 
@@ -50,16 +50,14 @@ function createPlayer() {
     if (
       event.keyCode === 37 &&
       player.object.position.x !==
-        -(CONSTANTS.PLANE_WIDTH - CONSTANTS.PADDING) / 2 &&
-      player.object.position === 5
+        -(CONSTANTS.PLANE_WIDTH - CONSTANTS.PADDING) / 2 
     ) {
       player.object.position.x -=
         (CONSTANTS.PLANE_WIDTH - CONSTANTS.PADDING) / 2;
     } else if (
       event.keyCode === 39 &&
       player.object.position.x !==
-        (CONSTANTS.PLANE_WIDTH - CONSTANTS.PADDING) / 2 &&
-      player.object.position === 5
+        (CONSTANTS.PLANE_WIDTH - CONSTANTS.PADDING) / 2 
     ) {
       player.object.position.x +=
         (CONSTANTS.PLANE_WIDTH - CONSTANTS.PADDING) / 2;
@@ -67,13 +65,17 @@ function createPlayer() {
       let elapsed = 0;
       const jump = setInterval(function() {
         const delta = CONSTANTS.JUMP_TRAJECTION / (CONSTANTS.JUMP_DURATION / CONSTANTS.JUMP_REFRESH) * 2;
-
+        
         if (elapsed < CONSTANTS.JUMP_DURATION / 2) {
           player.object.position.y += delta;
         } else {
           player.object.position.y -= delta;
 
-          if (player.object.position.y === 5) clearInterval(jump);
+          if (elapsed >= CONSTANTS.JUMP_DURATION){
+            clearInterval(jump);
+            player.object.position.y = 5
+            elapsed = 0;
+          } 
         }
 
         elapsed += CONSTANTS.JUMP_REFRESH;
@@ -114,7 +116,7 @@ function main(mount) {
     CONSTANTS.PLANE_LENGTH / 2 + CONSTANTS.PLANE_LENGTH / 25
   );
 
-  GAME.controls = new OrbitControls(GAME.camera, GAME.renderer.domElement);
+  // GAME.controls = new OrbitControls(GAME.camera, GAME.renderer.domElement);
   // GAME.controls.enableKeys = false;
   // GAME.controls.enablePan = false;
   // GAME.controls.enableZoom = false;
@@ -154,22 +156,21 @@ function main(mount) {
   });
 
   createCactus();
-  // createPtero();
-  const ptero = new Pterodactyl();
+  createPtero();
   GAME.player = createPlayer();
   GAME.scene.add(GAME.camera, GAME.light.directional, GAME.light.hemisphere);
 
   function animate() {
-    ptero.render(GAME.scene);
 
     if (GAME.isPlaying) {
       requestAnimationFrame(animate);
       GAME.obstacles.forEach(obstacle => {
+        obstacle.render(GAME.scene)
         if (
-          obstacle.object.position.z <
+          obstacle.z <
           CONSTANTS.PLANE_LENGTH / 2 + CONSTANTS.PLANE_LENGTH / 10
         ) {
-          obstacle.object.position.z += 20;
+          obstacle.z += 10;
           GAME.score = Math.floor(GAME.clock.getElapsedTime() * 15);
           renderScore(GAME.score);
 
@@ -177,9 +178,11 @@ function main(mount) {
           if (bounds.intersectsBox(GAME.player.boundingBox)) {
             GAME.isPlaying = false;
           }
+        } else {
+          GAME.scene.remove(obstacle.object);
         }
       });
-      GAME.controls.update();
+      // GAME.controls.update();
       GAME.renderer.render(GAME.scene, GAME.camera);
     }
   }
@@ -187,7 +190,7 @@ function main(mount) {
 }
 
 function createCactus() {
-  const cactus = new Cactus();
+  
 
   const xPositionValues = [
     -(CONSTANTS.PLANE_WIDTH - CONSTANTS.PADDING) / 2,
@@ -200,16 +203,41 @@ function createCactus() {
   const yPosition = 3;
   const zPosition =
     zPositionValues[getRandomInteger(0, zPositionValues.length - 1)];
-  cactus.render(GAME.scene, xPosition, yPosition, zPosition);
+  const cactus = new Cactus(xPosition,yPosition,zPosition);
+  
   GAME.obstacles.push(cactus);
 
   const { MAX_INTERVAL, MIN_INTERVAL } = CONSTANTS;
   const nextSpawn = Math.floor(
     Math.random() * (MAX_INTERVAL - MIN_INTERVAL + 1) + MIN_INTERVAL
   );
-  setTimeout(createCactus, nextSpawn * 700);
+  setTimeout(createCactus, nextSpawn * 500);
 }
 
+
+function createPtero() {
+
+  const xPositionValues = [
+    -(CONSTANTS.PLANE_WIDTH - CONSTANTS.PADDING) / 2,
+    0,
+    (CONSTANTS.PLANE_WIDTH - CONSTANTS.PADDING) / 2
+  ];
+  const zPositionValues = [-(CONSTANTS.PLANE_LENGTH - CONSTANTS.PADDING) / 2];
+  const xPosition =
+    xPositionValues[getRandomInteger(0, xPositionValues.length - 1)];
+  const yPosition = 3;
+  const zPosition =
+    zPositionValues[getRandomInteger(0, zPositionValues.length - 1)];
+  
+  const ptero = new Pterodactyl(xPosition, yPosition, zPosition);
+  GAME.obstacles.push(ptero);
+
+  const { MAX_INTERVAL, MIN_INTERVAL } = CONSTANTS;
+  const nextSpawn = Math.floor(
+    Math.random() * (MAX_INTERVAL - MIN_INTERVAL + 1) + MIN_INTERVAL
+  );
+  setTimeout(createPtero, nextSpawn * 1000);
+}
 function getRandomInteger(min, max) {
   return Math.floor(Math.random() * (max - min + 1)) + min;
 }

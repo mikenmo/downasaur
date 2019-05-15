@@ -6,9 +6,10 @@ import brick from "../textures/brick.png";
 import soil from "../textures/soil.png";
 
 class Cactus {
-  constructor() {
-    this.x = 0;
-    this.y = 0;
+  constructor(x,y,z) {
+    this.x = x;
+    this.y = y;
+    this.z = z;
 
     this.object = new THREE.Object3D();
     this.boundingBox = new THREE.Box3().setFromObject(this.object);
@@ -57,7 +58,7 @@ class Cactus {
     this.object.add(mesh);
   }
 
-  render(scene, x, y, z) {
+  render(scene) {
     const loader = new THREE.TextureLoader();
 
     loader.load(grass, this._createPlant.bind(this));
@@ -66,9 +67,10 @@ class Cactus {
 
     this.object.castShadow = true;
     this.object.receiveShadow = true;
-    this.object.position.x = x;
-    this.object.position.y = y + 5;
-    this.object.position.z = z;
+    this.object.scale.set(0.75,0.75,0.75);
+    this.object.position.x = this.x;
+    this.object.position.y = this.y + 5;
+    this.object.position.z = this.z;
 
     scene.add(this.object);
   }
