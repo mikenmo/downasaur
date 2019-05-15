@@ -29,6 +29,8 @@ const GAME = {
   scene: null,
   axesHelper: null,
   camera: null,
+  lightEnabled: true,
+  lastLightChange: 0,
   player: null,
   controls: null,
   floor: null,
@@ -173,6 +175,16 @@ function main(mount) {
         ) {
           obstacle.z += 10;
           GAME.score = Math.floor(GAME.clock.getElapsedTime() * 15);
+          console.log(GAME.lightEnabled)
+          if(parseInt(GAME.clock.getElapsedTime())%10 === 0 && GAME.lastLightChange != parseInt(GAME.clock.getElapsedTime())){
+            GAME.lastLightChange = parseInt(GAME.clock.getElapsedTime())
+            GAME.lightEnabled = !GAME.lightEnabled
+            if(GAME.lightEnabled){
+              GAME.scene.add(GAME.light.directional)
+            }else{
+              GAME.scene.remove(GAME.light.directional)
+            }
+          }
           renderScore(GAME.score);
 
           const bounds = new THREE.Box3().setFromObject(obstacle.object);
