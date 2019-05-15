@@ -33,8 +33,12 @@ const renderHighScores = mount => {
 };
 
 export const renderScore = score => {
+  const highScore = localStorage.getItem('highscore');
   const html = `
-    <div class="score-holder">${score}</div>
+    <div class="score-holder">
+      ${score}
+    </div>
+    ${highScore ? `<div class="high-score">High Score: ${highScore}</div>`: ''}
   `;
 
   document.getElementById('score').innerHTML = html;
@@ -49,6 +53,10 @@ export const gameOverScreen = (score) => {
       <div class="showscore">Score: ${score}</div>
     </div>
   `;
+
+  // Save score to localStorage
+  const highScore = localStorage.getItem('highscore');
+  if (!highscore || highscore < score) localStorage.setItem('highscore', score);
 
   mountPoint.insertAdjacentHTML('afterbegin', html);
   const button = document.getElementById('again');
