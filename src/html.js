@@ -40,7 +40,7 @@ export const renderScore = score => {
   document.getElementById('score').innerHTML = html;
 }
 
-export const gameOverScreen = (score, main) => {
+export const gameOverScreen = (score) => {
   const mountPoint = document.getElementById('root');
   const html = `
     <div class="overlay">
@@ -51,12 +51,14 @@ export const gameOverScreen = (score, main) => {
   `;
 
   mountPoint.insertAdjacentHTML('afterbegin', html);
-  document.getElementById('again', () => main(mountPoint));
+  const button = document.getElementById('again');
+  button.addEventListener('click', ()=>{window.location.reload()});
 }
 
 function renderHTML(callback) {
   const mountPoint = document.getElementById("root");
   // renderMenu(mountPoint, callback);
+  mountPoint.innerHTML = '';
   callback(mountPoint);
 }
 

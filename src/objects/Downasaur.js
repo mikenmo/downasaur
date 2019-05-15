@@ -50,6 +50,7 @@ class Downasaur {
     ]);
     this.object.add(...tempMesh);
     this.object.scale.set(0.5, 0.5, 0.5);
+    this.boundingBox = new THREE.Box3().setFromObject(this.object);
   }
 
   render(scene, x, y, z) {

@@ -184,7 +184,7 @@ function main(mount) {
 
           if (bounds.intersectsBox(GAME.player.boundingBox)) {
             GAME.isPlaying = false;
-            gameOverScreen(GAME.score, main);
+            gameOverScreen(GAME.score);
           }
         } else {
           GAME.scene.remove(obstacle.object);
